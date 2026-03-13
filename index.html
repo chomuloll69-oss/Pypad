@@ -6,8 +6,45 @@
 <title>PyPad — Python Interpreter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js"></script>
+<script>
+// Load Skulpt with fallback CDN chain
+(function() {
+  function loadScript(src, onload, onerror) {
+    var s = document.createElement('script');
+    s.src = src; s.onload = onload; s.onerror = onerror;
+    document.head.appendChild(s);
+  }
+  var CDN1_CORE   = 'https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js';
+  var CDN1_STDLIB = 'https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js';
+  var CDN2_CORE   = 'https://unpkg.com/skulpt@1.2.0/dist/skulpt.min.js';
+  var CDN2_STDLIB = 'https://unpkg.com/skulpt@1.2.0/dist/skulpt-stdlib.js';
+
+  function loadStdlib(coreUrl, stdlibUrl, fallbackCore, fallbackStdlib) {
+    loadScript(stdlibUrl, function() {
+      window._skulptLoaded = true;
+      console.log('Skulpt loaded from:', coreUrl);
+    }, function() {
+      if (fallbackStdlib) {
+        loadStdlib(fallbackCore, fallbackStdlib, null, null);
+      } else {
+        window._skulptLoadFailed = true;
+        console.error('Skulpt stdlib failed to load from all CDNs');
+      }
+    });
+  }
+
+  loadScript(CDN1_CORE, function() {
+    loadStdlib(CDN1_CORE, CDN1_STDLIB, CDN2_CORE, CDN2_STDLIB);
+  }, function() {
+    loadScript(CDN2_CORE, function() {
+      loadStdlib(CDN2_CORE, CDN2_STDLIB, null, null);
+    }, function() {
+      window._skulptLoadFailed = true;
+      console.error('Skulpt core failed to load from all CDNs');
+    });
+  });
+})();
+</script>
 <style>
   /* ============================================
      M3 EXPRESSIVE — DESIGN TOKENS (PURPLE SEED)
@@ -1627,12 +1664,33 @@ function runCode() {
   runFab.appendChild(ripple);
   setTimeout(() => ripple.remove(), 500);
 
-  // Make sure Skulpt is loaded
+  // Wait for Skulpt to load (async CDN), retry up to 5s
   if (typeof Sk === 'undefined') {
-    appendOutput('❌  Skulpt not loaded. Check connection.', 'error');
-    resetFab(); return;
+    appendOutput('⏳  Loading Python engine…', 'info');
+    let attempts = 0;
+    const wait = setInterval(() => {
+      attempts++;
+      if (typeof Sk !== 'undefined') {
+        clearInterval(wait);
+        outputEl.innerHTML = '';
+        appendOutput('▶  Running…', 'system');
+        execWithSkulpt(code);
+      } else if (attempts > 25) {
+        clearInterval(wait);
+        outputEl.innerHTML = '';
+        appendOutput('❌  Python engine failed to load.', 'error');
+        appendOutput('   • Check your internet connection 📡', 'error');
+        appendOutput('   • Try refreshing the page 🔄', 'error');
+        resetFab();
+      }
+    }, 200);
+    return;
   }
 
+  execWithSkulpt(code);
+}
+
+function execWithSkulpt(code) {
   Sk.configure({
     output: txt => {
       const lines = txt.split('\n');
