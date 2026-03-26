@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>PyPad — Python Interpreter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=settings" />
+<script>
+// Load Skulpt with fallback CDN chain
+(function() {
+function loadScript(src, onload, onerror) {
+var s = document.createElement('script');
+s.src = src; s.onload = onload; s.onerror = onerror;
+document.head.appendChild(s);
+}
+var CDN1_CORE = 'https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js';
+var CDN1_STDLIB = 'https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js';
+var CDN2_CORE = 'https://unpkg.com/skulpt@1.2.0/dist/skulpt.min.js';
+var CDN2_STDLIB = 'https://unpkg.com/skulpt@1.2.0/dist/skulpt-stdlib.js';
+
+function loadStdlib(coreUrl, stdlibUrl, fallbackCore, fallbackStdlib) {
+loadScript(stdlibUrl, function() {
+window._skulptLoaded = true;
+console.log('Skulpt loaded from:', coreUrl);
+}, function() {
+if (fallbackStdlib) {
+loadStdlib(fallbackCore, fallbackStdlib, null, null);
+} else {
+window._skulptLoadFailed = true;
+console.error('Skulpt stdlib failed to load from all CDNs');
+}
+});
+}
+
+loadScript(CDN1_CORE, function() {
+loadStdlib(CDN1_CORE, CDN1_STDLIB, CDN2_CORE, CDN2_STDLIB);
+}, function() {
+loadScript(CDN2_CORE, function() {
+loadStdlib(CDN2_CORE, CDN2_STDLIB, null, null);
+}, function() {
+window._skulptLoadFailed = true;
+console.error('Skulpt core failed to load from all CDNs');
+});
+});
+})();
+</script>
+<style>
+/* ============================================
+     M3 EXPRESSIVE — DESIGN TOKENS (PURPLE SEED)
+  ============================================ */
+:root {
+--md-sys-color-primary: #D0BCFF;
+--md-sys-color-on-primary: #381E72;
+--md-sys-color-primary-container: #4F378B;
+--md-sys-color-on-primary-container: #EADDFF;
+--md-sys-color-secondary: #CCC2DC;
+--md-sys-color-on-secondary: #332D41;
+--md-sys-color-secondary-container: #4A4458;
+--md-sys-color-on-secondary-container: #E8DEF8;
+--md-sys-color-tertiary: #EFB8C8;
+--md-sys-color-on-tertiary: #492532;
+--md-sys-color-tertiary-container: #633B48;
+--md-sys-color-on-tertiary-container: #FFD8E4;
+--md-sys-color-error: #F2B8B5;
+--md-sys-color-on-error: #601410;
+--md-sys-color-error-container: #8C1D18;
+--md-sys-color-on-error-container: #F9DEDC;
+--md-sys-color-background: #141218;
+--md-sys-color-on-background: #E6E0E9;
+--md-sys-color-surface: #141218;
+--md-sys-color-on-surface: #E6E0E9;
+--md-sys-color-surface-variant: #49454F;
+--md-sys-color-on-surface-variant: #CAC4D0;
+--md-sys-color-outline: #938F99;
+--md-sys-color-outline-variant: #49454F;
+--md-sys-color-surface-container-lowest: #0F0D13;
+--md-sys-color-surface-container-low: #1D1B20;
+--md-sys-color-surface-container: #211F26;
+--md-sys-color-surface-container-high: #2B2930;
+--md-sys-color-surface-container-highest: #36343B;
+--md-sys-color-inverse-surface: #E6E0E9;
+--md-sys-color-inverse-on-surface: #322F35;
+--md-sys-color-inverse-primary: #6750A4;
+--md-sys-color-scrim: #000000;
+--md-sys-color-shadow: #000000;
+
+/* Light theme overrides (toggled via class) */
+--theme-bg: var(--md-sys-color-background);
+--theme-surface: var(--md-sys-color-surface-container-low);
+--theme-surface-high: var(--md-sys-color-surface-container-high);
+--theme-on-surface: var(--md-sys-color-on-surface);
+--theme-primary: var(--md-sys-color-primary);
+--theme-primary-container: var(--md-sys-color-primary-container);
+--theme-on-primary: var(--md-sys-color-on-primary);
+--theme-outline: var(--md-sys-color-outline);
+--theme-outline-variant: var(--md-sys-color-outline-variant);
+
+/* M3 Shape scale */
+--shape-xs: 4px;
+--shape-sm: 8px;
+--shape-md: 12px;
+--shape-lg: 16px;
+--shape-xl: 24px;
+--shape-2xl: 28px;
+--shape-full: 9999px;
+
+/* M3 Elevation (shadow) */
+--elev-1: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15);
+--elev-2: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15);
+--elev-3: 0 4px 8px 3px rgba(0,0,0,.15), 0 1px 3px rgba(0,0,0,.3);
+
+/* Motion — M3 Expressive spring-like easing */
+--motion-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+--motion-standard: cubic-bezier(0.2, 0, 0, 1);
+--motion-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+--motion-duration-short: 200ms;
+--motion-duration-medium: 350ms;
+--motion-duration-long: 500ms;
+}
+
+.light-theme {
+--md-sys-color-primary: #6750A4;
+--md-sys-color-on-primary: #FFFFFF;
+--md-sys-color-primary-container: #EADDFF;
+--md-sys-color-on-primary-container: #21005D;
+--md-sys-color-secondary: #625B71;
+--md-sys-color-on-secondary: #FFFFFF;
+--md-sys-color-secondary-container: #E8DEF8;
+--md-sys-color-on-secondary-container: #1D192B;
+--md-sys-color-background: #FFFBFE;
+--md-sys-color-on-background: #1C1B1F;
+--md-sys-color-surface: #FFFBFE;
+--md-sys-color-on-surface: #1C1B1F;
+--md-sys-color-surface-variant: #E7E0EC;
+--md-sys-color-on-surface-variant: #49454F;
+--md-sys-color-outline: #79747E;
+--md-sys-color-outline-variant: #CAC4D0;
+--md-sys-color-surface-container-lowest: #FFFFFF;
+--md-sys-color-surface-container-low: #F7F2FA;
+--md-sys-color-surface-container: #F3EDF7;
+--md-sys-color-surface-container-high: #ECE6F0;
+--md-sys-color-surface-container-highest: #E6E0E9;
+}
+
+/* ============================================
+     RESET + BASE
+  ============================================ */
+*, *::before, *::after { box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+html, body {
+height: 100%;
+width: 100%;
+overflow: hidden;
+font-family: 'Space Grotesk', sans-serif;
+background: var(--md-sys-color-background);
+color: var(--md-sys-color-on-surface);
+-webkit-font-smoothing: antialiased;
+transition: background var(--motion-duration-medium) var(--motion-standard),
+color var(--motion-duration-medium) var(--motion-standard);
+}
+
+/* ============================================
+     APP SHELL — MOBILE FIRST
+  ============================================ */
+.app-shell {
+display: flex;
+flex-direction: column;
+height: 100dvh;
+position: relative;
+overflow: hidden;
+}
+
+/* ============================================
+     TOP APP BAR — M3 Expressive
+  ============================================ */
+.top-bar {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 16px 12px 16px;
+background: var(--md-sys-color-surface-container-low);
+border-bottom: 1px solid var(--md-sys-color-outline-variant);
+flex-shrink: 0;
+z-index: 10;
+position: relative;
+}
+
+.top-bar::after {
+content: '';
+position: absolute;
+bottom: 0;
+left: 0;
+right: 0;
+height: 1px;
+background: linear-gradient(90deg, transparent, var(--md-sys-color-primary), transparent);
+opacity: 0.4;
+}
+
+.brand {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.brand-icon {
+width: 36px;
+height: 36px;
+border-radius: var(--shape-md);
+background: linear-gradient(135deg, var(--md-sys-color-primary-container), var(--md-sys-color-primary));
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+box-shadow: var(--elev-1);
+flex-shrink: 0;
+transition: transform var(--motion-duration-short) var(--motion-spring);
+}
+.brand-icon:active { transform: scale(0.92);
+}
+
+.brand-text {
+display: flex;
+flex-direction: column;
+}
+.brand-name {
+font-size: 18px;
+font-weight: 700;
+color: var(--md-sys-color-on-surface);
+letter-spacing: -0.3px;
+line-height: 1;
+}
+.brand-sub {
+font-size: 11px;
+font-weight: 400;
+color: var(--md-sys-color-on-surface-variant);
+letter-spacing: 0.4px;
+line-height: 1.4;
+}
+
+.top-actions {
+display: flex;
+gap: 6px;
+align-items: center;
+}
+
+.icon-btn {
+width: 40px;
+height: 40px;
+border-radius: var(--shape-full);
+background: transparent;
+border: none;
+color: var(--md-sys-color-on-surface-variant);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+transition: background var(--motion-duration-short) var(--motion-standard),
+color var(--motion-duration-short) var(--motion-standard),
+transform var(--motion-duration-short) var(--motion-spring);
+-webkit-tap-highlight-color: transparent;
+position: relative;
+overflow: hidden;
+}
+
+.icon-btn::before {
+content: '';
+position: absolute;
+inset: 0;
+border-radius: var(--shape-full);
+background: var(--md-sys-color-on-surface);
+opacity: 0;
+transition: opacity var(--motion-duration-short) var(--motion-standard);
+}
+.icon-btn:hover::before { opacity: 0.08;
+}
+.icon-btn:active { transform: scale(0.88);
+}
+.icon-btn:active::before { opacity: 0.12;
+}
+
+/* ============================================
+     EDITOR AREA
+  ============================================ */
+.editor-section {
+flex: 1;
+display: flex;
+flex-direction: column;
+overflow: hidden;
+position: relative;
+}
+
+.editor-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 8px 16px 6px;
+background: var(--md-sys-color-surface-container);
+flex-shrink: 0;
+}
+
+.file-chip {
+display: flex;
+align-items: center;
+gap: 6px;
+background: var(--md-sys-color-surface-container-high);
+border: 1px solid var(--md-sys-color-outline-variant);
+border-radius: var(--shape-full);
+padding: 4px 12px 4px 8px;
+font-size: 12px;
+font-family: 'JetBrains Mono', monospace;
+color: var(--md-sys-color-primary);
+font-weight: 500;
+}
+.file-chip span { opacity: 0.8;
+}
+.chip-icon { display: flex;
+align-items: center;
+opacity: 0.9;
+}
+
+.editor-meta {
+font-size: 11px;
+color: var(--md-sys-color-on-surface-variant);
+font-family: 'JetBrains Mono', monospace;
+}
+
+/* CodeMirror-like editor wrapper */
+.editor-wrapper {
+flex: 1;
+overflow: hidden;
+position: relative;
+background: var(--md-sys-color-surface-container-lowest);
+}
+
+#editor-container {
+width: 100%;
+height: 100%;
+overflow: auto;
+position: relative;
+}
+
+.code-area {
+display: flex;
+min-height: 100%;
+font-family: 'JetBrains Mono', monospace;
+font-size: 13px;
+line-height: 1.7;
+tab-size: 4;
+position: relative;
+}
+
+.line-numbers {
+padding: 12px 8px 12px 12px;
+background: var(--md-sys-color-surface-container-low);
+border-right: 1px solid var(--md-sys-color-outline-variant);
+color: var(--md-sys-color-on-surface-variant);
+user-select: none;
+font-size: 12px;
+text-align: right;
+min-width: 42px;
+flex-shrink: 0;
+opacity: 0.6;
+line-height: 1.7;
+white-space: pre;
+overflow: hidden;
+}
+
+.editor-input-wrapper {
+flex: 1;
+position: relative;
+overflow: hidden;
+}
+
+/* Syntax highlighted display layer */
+.highlight-layer {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+pointer-events: none;
+padding: 12px 12px 12px 8px;
+white-space: pre-wrap;
+word-break: break-word;
+font-family: 'JetBrains Mono', monospace;
+font-size: 13px;
+line-height: 1.7;
+color: transparent;
+overflow: hidden;
+}
+
+/* The actual textarea */
+#code-input {
+width: 100%;
+height: 100%;
+padding: 12px 12px 12px 8px;
+background: transparent;
+border: none;
+outline: none;
+resize: none;
+font-family: 'JetBrains Mono', monospace;
+font-size: 13px;
+line-height: 1.7;
+color: var(--md-sys-color-on-surface);
+caret-color: var(--md-sys-color-primary);
+position: relative;
+z-index: 2;
+white-space: pre;
+overflow-wrap: normal;
+overflow-x: auto;
+tab-size: 4;
+-webkit-text-fill-color: transparent;
+/* Show cursor via caret even with transparent text */
+}
+
+/* Fallback: if browser doesn't handle well, show normal */
+@supports not (-webkit-text-fill-color: transparent) {
+#code-input { color: var(--md-sys-color-on-surface);
+}
+}
+
+/* Python Syntax Colors */
+.syn-keyword { color: #C792EA;
+font-weight: 600;
+}
+.syn-builtin { color: #82AAFF;
+}
+.syn-string { color: #C3E88D;
+}
+.syn-comment { color: #546E7A;
+font-style: italic;
+}
+.syn-number { color: #F78C6C;
+}
+.syn-operator { color: #89DDFF;
+}
+.syn-bracket { color: #FFD700;
+}
+.syn-function { color: #FFCB6B;
+}
+.syn-class-name{ color: #FFCB6B;
+font-weight: 600;
+}
+.syn-decorator { color: #F07178;
+}
+.syn-self { color: #FF5370;
+font-style: italic;
+}
+.syn-bool { color: #FF5370;
+font-weight: 600;
+}
+.syn-none { color: #FF5370;
+font-weight: 600;
+}
+.syn-default { color: var(--md-sys-color-on-surface);
+}
+
+/* Light theme syntax */
+.light-theme .syn-keyword { color: #7C4DFF;
+font-weight: 600;
+}
+.light-theme .syn-builtin { color: #0070C1;
+}
+.light-theme .syn-string { color: #067D17;
+}
+.light-theme .syn-comment { color: #7E7E7E;
+font-style: italic;
+}
+.light-theme .syn-number { color: #C44700;
+}
+.light-theme .syn-operator { color: #0070C1;
+}
+.light-theme .syn-bracket { color: #8B6914;
+}
+.light-theme .syn-function { color: #795E26;
+}
+.light-theme .syn-class-name{ color: #267F99;
+font-weight: 600;
+}
+.light-theme .syn-decorator { color: #AF00DB;
+}
+.light-theme .syn-self { color: #001080;
+font-style: italic;
+}
+.light-theme .syn-bool { color: #0000FF;
+font-weight: 600;
+}
+.light-theme .syn-none { color: #0000FF;
+font-weight: 600;
+}
+.light-theme .syn-default { color: #1C1B1F;
+}
+
+/* ============================================
+     AUTOCOMPLETE DROPDOWN
+  ============================================ */
+#autocomplete-box {
+position: fixed;
+background: var(--md-sys-color-surface-container-high);
+border: 1px solid var(--md-sys-color-outline);
+border-radius: var(--shape-md);
+box-shadow: var(--elev-3);
+overflow: hidden;
+z-index: 100;
+max-height: 200px;
+overflow-y: auto;
+min-width: 180px;
+max-width: 280px;
+display: none;
+animation: popIn var(--motion-duration-short) var(--motion-spring);
+scrollbar-width: thin;
+scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+}
+
+@keyframes popIn {
+from { opacity: 0;
+transform: scale(0.92) translateY(-4px);
+}
+to { opacity: 1;
+transform: scale(1) translateY(0);
+}
+}
+
+.ac-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 10px 14px;
+cursor: pointer;
+font-family: 'JetBrains Mono', monospace;
+font-size: 12px;
+color: var(--md-sys-color-on-surface);
+transition: background var(--motion-duration-short) var(--motion-standard);
+border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+.ac-item:last-child { border-bottom: none;
+}
+.ac-item:hover, .ac-item.selected {
+background: rgba(208,188,255,0.15);
+color: var(--md-sys-color-primary);
+}
+.ac-badge {
+font-size: 9px;
+padding: 2px 5px;
+border-radius: var(--shape-xs);
+font-family: 'Space Grotesk', sans-serif;
+font-weight: 600;
+letter-spacing: 0.3px;
+flex-shrink: 0;
+}
+.ac-badge.kw { background: rgba(199,146,234,0.2);
+color: #C792EA;
+}
+.ac-badge.fn { background: rgba(255,203,107,0.2);
+color: #FFCB6B;
+}
+.ac-badge.bi { background: rgba(130,170,255,0.2);
+color: #82AAFF;
+}
+.ac-badge.sn { background: rgba(195,232,141,0.2);
+color: #C3E88D;
+}
+.ac-name { flex: 1;
+}
+
+/* ============================================
+     RESIZE HANDLE
+  ============================================ */
+.resize-handle {
+height: 6px;
+background: var(--md-sys-color-surface-container);
+cursor: ns-resize;
+position: relative;
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: background var(--motion-duration-short) var(--motion-standard);
+}
+.resize-handle::after {
+content: '';
+width: 32px;
+height: 3px;
+border-radius: var(--shape-full);
+background: var(--md-sys-color-outline-variant);
+transition: background var(--motion-duration-short), width var(--motion-duration-short) var(--motion-spring);
+}
+.resize-handle:hover::after { width: 48px;
+background: var(--md-sys-color-primary);
+}
+.resize-handle.dragging::after { width: 56px;
+background: var(--md-sys-color-primary);
+}
+
+/* ============================================
+     OUTPUT PANEL
+  ============================================ */
+.output-section {
+background: var(--md-sys-color-surface-container-lowest);
+border-top: 1px solid var(--md-sys-color-outline-variant);
+display: flex;
+flex-direction: column;
+flex-shrink: 0;
+height: 200px;
+min-height: 80px;
+max-height: 60vh;
+transition: height var(--motion-duration-medium) var(--motion-emphasized);
+overflow: hidden;
+}
+
+.output-header {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 8px 14px 8px 12px;
+background: var(--md-sys-color-surface-container);
+border-bottom: 1px solid var(--md-sys-color-outline-variant);
+flex-shrink: 0;
+}
+
+.output-label {
+font-size: 12px;
+font-weight: 600;
+color: var(--md-sys-color-on-surface-variant);
+text-transform: uppercase;
+letter-spacing: 1px;
+flex: 1;
+}
+
+.status-dot {
+width: 7px;
+height: 7px;
+border-radius: 50%;
+background: var(--md-sys-color-outline);
+transition: background var(--motion-duration-short), transform var(--motion-duration-short) var(--motion-spring);
+}
+.status-dot.running {
+background: #FFCB6B;
+animation: pulse 0.7s ease-in-out infinite alternate;
+}
+.status-dot.success { background: #C3E88D;
+}
+.status-dot.error { background: #F2B8B5;
+}
+
+@keyframes pulse {
+from { transform: scale(1);
+opacity: 0.8;
+}
+to { transform: scale(1.4);
+opacity: 1;
+}
+}
+
+#output {
+flex: 1;
+overflow-y: auto;
+padding: 10px 14px;
+font-family: 'JetBrains Mono', monospace;
+font-size: 12px;
+line-height: 1.7;
+color: var(--md-sys-color-on-surface);
+white-space: pre-wrap;
+word-break: break-word;
+scrollbar-width: thin;
+scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+}
+
+#output .out-line { display: block;
+}
+#output .out-line.error { color: var(--md-sys-color-error);
+}
+#output .out-line.success { color: #C3E88D;
+}
+#output .out-line.info { color: var(--md-sys-color-on-surface-variant);
+font-style: italic;
+}
+#output .out-line.system { color: var(--md-sys-color-primary);
+font-weight: 500;
+}
+
+/* ============================================
+     BOTTOM NAV BAR — M3 Expressive
+  ============================================ */
+.bottom-nav {
+display: flex;
+align-items: center;
+background: var(--md-sys-color-surface-container-low);
+border-top: 1px solid var(--md-sys-color-outline-variant);
+padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+flex-shrink: 0;
+position: relative;
+z-index: 10;
+}
+
+.nav-item {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 3px;
+padding: 4px 8px;
+cursor: pointer;
+background: none;
+border: none;
+-webkit-tap-highlight-color: transparent;
+color: var(--md-sys-color-on-surface-variant);
+transition: color var(--motion-duration-short) var(--motion-standard);
+position: relative;
+}
+
+.nav-indicator {
+position: absolute;
+top: 1px;
+left: 50%;
+transform: translateX(-50%) scaleX(0);
+width: 56px;
+height: 32px;
+background: var(--md-sys-color-secondary-container);
+border-radius: var(--shape-full);
+transition: transform var(--motion-duration-medium) var(--motion-spring),
+background var(--motion-duration-short);
+z-index: 0;
+}
+
+.nav-item.active .nav-indicator { transform: translateX(-50%) scaleX(1);
+}
+.nav-item.active { color: var(--md-sys-color-on-secondary-container);
+}
+
+.material-symbols-outlined {
+font-family: 'Material Symbols Outlined', sans-serif;
+font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+font-size: 22px;
+line-height: 1;
+user-select: none;
+display: inline-block;
+/* Fallback: if font doesn't load, hide the ugly text */
+overflow: hidden;
+width: 22px;
+height: 22px;
+text-align: center;
+}
+
+/* If Material Symbols fails, show SVG fallback via CSS */
+.settings-icon-fallback {
+display: none;
+}
+
+@supports not (font-family: 'Material Symbols Outlined') {
+.material-symbols-outlined { display: none;
+}
+.settings-icon-fallback { display: inline-block;
+}
+}
+
+.nav-icon {
+font-size: 20px;
+position: relative;
+z-index: 1;
+transition: transform var(--motion-duration-short) var(--motion-spring);
+}
+.nav-item:active .nav-icon { transform: scale(0.85);
+}
+.nav-item.active .nav-icon { transform: scale(1.05);
+}
+
+.nav-label {
+font-size: 10px;
+font-weight: 500;
+position: relative;
+z-index: 1;
+letter-spacing: 0.2px;
+}
+
+/* ============================================
+     FAB — RUN BUTTON (M3 Expressive FAB)
+  ============================================ */
+.run-fab {
+position: fixed;
+bottom: calc(72px + env(safe-area-inset-bottom));
+right: 16px;
+width: 56px;
+height: 56px;
+border-radius: var(--shape-xl);
+background: var(--md-sys-color-primary-container);
+color: var(--md-sys-color-on-primary-container);
+border: none;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 24px;
+box-shadow: var(--elev-3);
+z-index: 20;
+transition: transform var(--motion-duration-short) var(--motion-spring),
+box-shadow var(--motion-duration-short) var(--motion-standard),
+background var(--motion-duration-short),
+border-radius var(--motion-duration-medium) var(--motion-spring),
+width var(--motion-duration-medium) var(--motion-spring);
+-webkit-tap-highlight-color: transparent;
+overflow: hidden;
+}
+
+.run-fab:hover {
+box-shadow: 0 6px 20px rgba(208,188,255,0.4);
+transform: translateY(-2px);
+}
+.run-fab:active {
+transform: scale(0.93);
+box-shadow: var(--elev-1);
+}
+
+.run-fab.running {
+background: var(--md-sys-color-tertiary-container);
+border-radius: var(--shape-full);
+}
+
+/* Console mini FAB — sits above run FAB when output is collapsed */
+.console-fab {
+position: fixed;
+bottom: calc(72px + env(safe-area-inset-bottom));
+right: 16px;
+width: 40px;
+height: 40px;
+border-radius: var(--shape-lg);
+background: var(--md-sys-color-surface-container-high);
+border: 1px solid var(--md-sys-color-outline-variant);
+color: var(--md-sys-color-on-surface-variant);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: var(--elev-2);
+z-index: 19;
+opacity: 0;
+pointer-events: none;
+transform: translateY(0px) scale(0.8);
+transition: opacity var(--motion-duration-medium) var(--motion-spring),
+transform var(--motion-duration-medium) var(--motion-spring),
+bottom var(--motion-duration-medium) var(--motion-emphasized);
+-webkit-tap-highlight-color: transparent;
+}
+
+.console-fab.visible {
+opacity: 1;
+pointer-events: auto;
+transform: translateY(0px) scale(1);
+/* sit right above run-fab with 8px gap: run-fab bottom + run-fab height + gap */
+bottom: calc(72px + env(safe-area-inset-bottom) + 56px + 8px);
+}
+
+.console-fab:active {
+transform: scale(0.88);
+}
+
+/* pulse badge on console fab when there's output */
+.console-fab .output-badge {
+position: absolute;
+top: -3px;
+right: -3px;
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: var(--md-sys-color-primary);
+border: 2px solid var(--md-sys-color-background);
+display: none;
+}
+.console-fab.has-output .output-badge { display: block;
+}
+
+.fab-ripple {
+position: absolute;
+border-radius: 50%;
+background: rgba(255,255,255,0.3);
+transform: scale(0);
+animation: ripple 0.5s ease-out;
+pointer-events: none;
+}
+@keyframes ripple {
+to { transform: scale(4);
+opacity: 0;
+}
+}
+
+/* ============================================
+     PANELS (TABS)
+  ============================================ */
+.panel { display: none;
+}
+.panel.active { display: flex;
+flex-direction: column;
+flex: 1;
+overflow: hidden;
+}
+
+/* ============================================
+     SETTINGS PANEL
+  ============================================ */
+.settings-panel {
+padding: 16px;
+overflow-y: auto;
+flex: 1;
+scrollbar-width: thin;
+scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+}
+
+.settings-section-title {
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 1.2px;
+color: var(--md-sys-color-primary);
+margin: 16px 0 8px;
+padding-left: 2px;
+}
+.settings-section-title:first-child { margin-top: 0;
+}
+
+.settings-card {
+background: var(--md-sys-color-surface-container);
+border-radius: var(--shape-xl);
+overflow: hidden;
+margin-bottom: 12px;
+border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.setting-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 16px;
+gap: 12px;
+border-bottom: 1px solid var(--md-sys-color-outline-variant);
+transition: background var(--motion-duration-short) var(--motion-standard);
+}
+.setting-row:last-child { border-bottom: none;
+}
+.setting-row:hover { background: rgba(208,188,255,0.05);
+}
+
+.setting-info { flex: 1;
+}
+.setting-label {
+font-size: 14px;
+font-weight: 500;
+color: var(--md-sys-color-on-surface);
+margin-bottom: 2px;
+}
+.setting-sub {
+font-size: 12px;
+color: var(--md-sys-color-on-surface-variant);
+line-height: 1.4;
+}
+
+/* M3 Switch */
+.m3-switch {
+  width: 52px;
+  height: 32px;
+  border-radius: var(--shape-full);
+  background: var(--md-sys-color-surface-variant);
+  border: 2px solid var(--md-sys-color-outline);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--motion-duration-medium) var(--motion-standard),
+              border-color var(--motion-duration-medium) var(--motion-standard);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  display: inline-block;
+}
+.m3-switch.on {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+}
+.m3-switch-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* OFF state */
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  background: var(--md-sys-color-outline);
+  transition: left var(--motion-duration-medium) var(--motion-spring),
+              width var(--motion-duration-short) var(--motion-spring),
+              height var(--motion-duration-short) var(--motion-spring),
+              background var(--motion-duration-medium) var(--motion-standard);
+}
+.m3-switch.on .m3-switch-thumb {
+  /* ON state */
+  width: 24px;
+  height: 24px;
+  left: calc(52px - 24px - 4px - 4px);
+  background: var(--md-sys-color-on-primary);
+}
+/* checkmark always in DOM, visibility controlled by opacity not display */
+.m3-switch-thumb .switch-check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--motion-duration-short) var(--motion-standard) var(--motion-duration-short);
+}
+.m3-switch.on .m3-switch-thumb .switch-check {
+  opacity: 1;
+}
+
+/* Font size select */
+.m3-select {
+background: var(--md-sys-color-surface-container-high);
+border: 1px solid var(--md-sys-color-outline);
+border-radius: var(--shape-sm);
+padding: 6px 10px;
+font-family: 'Space Grotesk', sans-serif;
+font-size: 13px;
+color: var(--md-sys-color-on-surface);
+outline: none;
+cursor: pointer;
+}
+.m3-select:focus { border-color: var(--md-sys-color-primary);
+}
+
+/* Theme selector pills */
+.theme-pills {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+padding: 12px 16px;
+}
+.theme-pill {
+padding: 6px 14px;
+border-radius: var(--shape-full);
+font-size: 12px;
+font-weight: 600;
+cursor: pointer;
+border: 2px solid transparent;
+transition: all var(--motion-duration-short) var(--motion-spring);
+-webkit-tap-highlight-color: transparent;
+}
+.theme-pill.active {
+border-color: var(--md-sys-color-primary);
+background: rgba(208,188,255,0.1);
+color: var(--md-sys-color-primary);
+}
+
+/* ============================================
+     SNACKBAR / TOAST
+  ============================================ */
+#snackbar {
+position: fixed;
+bottom: calc(80px + env(safe-area-inset-bottom));
+left: 50%;
+transform: translateX(-50%) translateY(20px);
+background: var(--md-sys-color-inverse-surface);
+color: var(--md-sys-color-inverse-on-surface);
+padding: 12px 20px;
+border-radius: var(--shape-sm);
+font-size: 13px;
+font-weight: 500;
+box-shadow: var(--elev-3);
+z-index: 200;
+opacity: 0;
+transition: opacity var(--motion-duration-short) var(--motion-standard),
+transform var(--motion-duration-short) var(--motion-spring);
+pointer-events: none;
+white-space: nowrap;
+max-width: calc(100vw - 32px);
+text-align: center;
+}
+#snackbar.show {
+opacity: 1;
+transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================
+     SCROLLBARS
+  ============================================ */
+::-webkit-scrollbar { width: 4px;
+height: 4px;
+}
+::-webkit-scrollbar-track { background: transparent;
+}
+::-webkit-scrollbar-thumb {
+background: var(--md-sys-color-outline-variant);
+border-radius: 2px;
+}
+
+/* ============================================
+     LOADING STATE
+  ============================================ */
+.skulpt-loading {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 20px;
+color: var(--md-sys-color-on-surface-variant);
+font-size: 13px;
+}
+.loader-ring {
+width: 20px;
+height: 20px;
+border: 2px solid var(--md-sys-color-outline-variant);
+border-top-color: var(--md-sys-color-primary);
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg);
+} }
+
+/* ============================================
+     KEYBOARD SHORTCUT TOOLTIP
+  ============================================ */
+.kbd-hint {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+font-size: 10px;
+color: var(--md-sys-color-on-surface-variant);
+}
+.kbd {
+background: var(--md-sys-color-surface-container-high);
+border: 1px solid var(--md-sys-color-outline-variant);
+border-radius: var(--shape-xs);
+padding: 1px 5px;
+font-family: 'JetBrains Mono', monospace;
+font-size: 9px;
+color: var(--md-sys-color-on-surface-variant);
+}
+
+/* ============================================
+     CANVAS INPUT CURSOR FIX
+  ============================================ */
+.editor-wrapper textarea { caret-color: var(--md-sys-color-primary);
+}
+
+/* ============================================
+     EXPORT BUTTON
+  ============================================ */
+.export-btn {
+display: flex;
+align-items: center;
+gap: 8px;
+background: var(--md-sys-color-secondary-container);
+color: var(--md-sys-color-on-secondary-container);
+border: none;
+border-radius: var(--shape-full);
+padding: 10px 20px;
+font-family: 'Space Grotesk', sans-serif;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+width: 100%;
+justify-content: center;
+margin-bottom: 8px;
+transition: transform var(--motion-duration-short) var(--motion-spring),
+background var(--motion-duration-short);
+-webkit-tap-highlight-color: transparent;
+}
+.export-btn:active { transform: scale(0.96);
+}
+.export-btn.primary-btn {
+background: var(--md-sys-color-primary-container);
+color: var(--md-sys-color-on-primary-container);
+}
+
+.clear-btn {
+display: flex;
+align-items: center;
+gap: 8px;
+background: transparent;
+color: var(--md-sys-color-error);
+border: 1px solid var(--md-sys-color-error);
+border-radius: var(--shape-full);
+padding: 10px 20px;
+font-family: 'Space Grotesk', sans-serif;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+width: 100%;
+justify-content: center;
+transition: transform var(--motion-duration-short) var(--motion-spring),
+background var(--motion-duration-short);
+-webkit-tap-highlight-color: transparent;
+}
+.clear-btn:active { transform: scale(0.96);
+background: rgba(242,184,181,0.1);
+}
+
+/* Responsive */
+@media (min-width: 600px) {
+.brand-name { font-size: 20px;
+}
+#code-input, .highlight-layer { font-size: 14px;
+}
+#output { font-size: 13px;
+}
+.run-fab { width: 64px;
+height: 64px;
+font-size: 28px;
+bottom: calc(80px + env(safe-area-inset-bottom));
+}
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell" id="app">
+
+<!-- TOP BAR -->
+<header class="top-bar">
+<div class="brand">
+<div class="brand-icon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="24" height="24">
+  <defs>
+    <linearGradient id="pyBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#387EB8"/>
+      <stop offset="100%" style="stop-color:#366994"/>
+    </linearGradient>
+    <linearGradient id="pyYellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE052"/>
+      <stop offset="100%" style="stop-color:#FFC331"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#pyBlue)" d="M54.9,4.6c-27.3,0-25.6,11.9-25.6,11.9l0,12.3h26v3.7H20.9c0,0-17.4-2-17.4,25.6s15.2,24.9,15.2,24.9h9.1V70.7c0,0-0.5-15.2,14.9-15.2h25.7c0,0,14.4,0.2,14.4-13.9V18.3C82.8,18.3,84.9,4.6,54.9,4.6z M40.5,12.2c2.6,0,4.7,2.1,4.7,4.7s-2.1,4.7-4.7,4.7s-4.7-2.1-4.7-4.7S37.9,12.2,40.5,12.2z"/>
+  <path fill="url(#pyYellow)" d="M55.5,105.4c27.3,0,25.6-11.9,25.6-11.9l0-12.3h-26v-3.7h34.4c0,0,17.4,2,17.4-25.6S91.7,27,91.7,27h-9.1v12.3c0,0,0.5,15.2-14.9,15.2H42c0,0-14.4-0.2-14.4,13.9v23.3C27.6,91.7,25.5,105.4,55.5,105.4z M69.9,97.8c-2.6,0-4.7-2.1-4.7-4.7s2.1-4.7,4.7-4.7s4.7,2.1,4.7,4.7S72.5,97.8,69.9,97.8z"/>
+</svg>
+</div>
+<div class="brand-text">
+<span class="brand-name">PyPad</span>
+<span class="brand-sub">Python Interpreter</span>
+</div>
+</div>
+<div class="top-actions">
+<button class="icon-btn" id="theme-toggle-btn" title="Toggle theme" aria-label="Toggle theme" style="display:flex;align-items:center;justify-content:center;">
+<!-- dark mode = show sun; light mode = show moon -->
+<svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" style="display:block;flex-shrink:0;" fill="#CAC4D0"><path d="M565-395q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm-226.5 56.5Q280-397 280-480t58.5-141.5Q397-680 480-680t141.5 58.5Q680-563 680-480t-58.5 141.5Q563-280 480-280t-141.5-58.5ZM80-440q-17 0-28.5-11.5T40-480q0-17 11.5-28.5T80-520h80q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440H80Zm720 0q-17 0-28.5-11.5T760-480q0-17 11.5-28.5T800-520h80q17 0 28.5 11.5T920-480q0 17-11.5 28.5T880-440h-80ZM451.5-771.5Q440-783 440-800v-80q0-17 11.5-28.5T480-920q17 0 28.5 11.5T520-880v80q0 17-11.5 28.5T480-760q-17 0-28.5-11.5Zm0 720Q440-63 440-80v-80q0-17 11.5-28.5T480-200q17 0 28.5 11.5T520-160v80q0 17-11.5 28.5T480-40q-17 0-28.5-11.5ZM226-678l-43-42q-12-11-11.5-28t11.5-29q12-12 29-12t28 12l42 43q11 12 11 28t-11 28q-11 12-27.5 11.5T226-678Zm494 495-42-43q-11-12-11-28.5t11-27.5q11-12 27.5-11.5T734-282l43 42q12 11 11.5 28T777-183q-12 12-29 12t-28-12Zm-42-495q-12-11-11.5-27.5T678-734l42-43q11-12 28-11.5t29 11.5q12 12 12 29t-12 28l-43 42q-12 11-28 11t-28-11ZM183-183q-12-12-12-29t12-28l43-42q12-11 28.5-11t27.5 11q12 11 11.5 27.5T282-226l-42 43q-11 12-28 11.5T183-183Zm297-297Z" /></svg>
+<svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" style="display:none;flex-shrink:0;" fill="#49454F"><path d="M480-120q-151 0-255.5-104.5T120-480q0-138 90-239.5T440-838q13-2 23 3.5t16 14.5q6 9 6.5 21t-7.5 23q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q11-7 22.5-6.5T819-479q10 5 15.5 15t3.5 24q-14 138-117.5 229T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z" /></svg>
+</button>
+<button class="icon-btn" id="clear-code-btn" title="Clear code" aria-label="Clear code"><svg xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="#CAC4D0"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z" /></svg></button>
+</div>
+</header>
+
+<!-- EDITOR PANEL -->
+<div class="panel active" id="panel-editor">
+<div class="editor-section" id="editor-section">
+<div class="editor-header">
+<div class="file-chip">
+<span class="chip-icon"><svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor"><path d="M360-440h240q17 0 28.5-11.5T640-480q0-17-11.5-28.5T600-520H360q-17 0-28.5 11.5T320-480q0 17 11.5 28.5T360-440Zm0 120h240q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400H360q-17 0-28.5 11.5T320-360q0 17 11.5 28.5T360-320Zm0 120h120q17 0 28.5-11.5T520-240q0-17-11.5-28.5T480-280H360q-17 0-28.5 11.5T320-240q0 17 11.5 28.5T360-200ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm480-520H580q-25 0-42.5-17.5T520-660v-140H240v640h480v-440ZM240-800v200-200 640-640Z" /></svg></span>
+<span id="filename-display">main.py</span>
+</div>
+<div class="kbd-hint">
+<span class="kbd">Ctrl</span>+<span class="kbd">Enter</span> to run
+</div>
+</div>
+<div class="editor-wrapper">
+<div id="editor-container">
+<div class="code-area">
+<div class="line-numbers" id="line-numbers">
+1
+</div>
+<div class="editor-input-wrapper">
+<div class="highlight-layer" id="highlight-layer" aria-hidden="true"></div>
+<textarea
+id="code-input"
+spellcheck="false"
+autocorrect="off"
+autocapitalize="off"
+autocomplete="off"
+placeholder="# yo bro just start typing 🐍&#10;# Ctrl+Enter to run  |  Tab for autocomplete 💜"
+wrap="off"
+></textarea>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RESIZE HANDLE -->
+<div class="resize-handle" id="resize-handle"></div>
+
+<!-- OUTPUT PANEL -->
+<div class="output-section" id="output-section">
+<div class="output-header">
+<div class="status-dot" id="status-dot"></div>
+<span class="output-label">Output</span>
+<button class="icon-btn" id="clear-output-btn" style="width:32px;height:32px;" title="Clear output"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="#CAC4D0"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z" /></svg></button>
+</div>
+<div id="output">
+<span class="out-line info">Ready!  Write Python and press ▶ to run…</span>
+</div>
+</div>
+</div>
+
+<!-- EXPORT PANEL -->
+<div class="panel" id="panel-export">
+<div class="settings-panel">
+<div class="settings-section-title">
+Export Code
+</div>
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M480-480ZM320-183l-90 90q-12 12-28 11.5T174-94q-11-12-11.5-28t11.5-28l90-90h-50q-17 0-28.5-11.5T174-280q0-17 11.5-28.5T214-320h146q17 0 28.5 11.5T400-280v146q0 17-11.5 28.5T360-94q-17 0-28.5-11.5T320-134v-49ZM171.5-411.5Q160-423 160-440v-360q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H520q-17 0-28.5-11.5T480-120q0-17 11.5-28.5T520-160h200v-440H560q-17 0-28.5-11.5T520-640v-160H240v360q0 17-11.5 28.5T200-400q-17 0-28.5-11.5Z" /></svg>Export as .py file
+</div>
+<div class="setting-sub">
+Download your Python source code
+</div>
+</div>
+</div>
+<div style="padding: 8px 16px 16px;">
+<button class="export-btn primary-btn" id="export-py-btn"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor" style="flex-shrink:0;"><path d="M465-339.5q-7-2.5-13-8.5L308-492q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T365-549l75 75v-286q0-17 11.5-28.5T480-800q17 0 28.5 11.5T520-760v286l75-75q12-12 28.5-11.5T652-548q11 12 11.5 28T652-492L508-348q-6 6-13 8.5t-15 2.5q-8 0-15-2.5ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z" /></svg> Download .py</button>
+</div>
+</div>
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z" /></svg>Copy to clipboard
+</div>
+<div class="setting-sub">
+Copy all code to clipboard
+</div>
+</div>
+</div>
+<div style="padding: 8px 16px 16px;">
+<button class="export-btn" id="copy-btn"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor" style="flex-shrink:0;"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z" /></svg> Copy Code</button>
+</div>
+</div>
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M253-173q-93-93-93-227 0-113 67-217t184-182q22-15 45.5-1.5T480-760v52q0 34 23.5 57t57.5 23q17 0 32.5-7.5T621-657q8-10 20.5-12.5T665-664q63 45 99 115t36 149q0 134-93 227T480-80q-134 0-227-93Zm-13-227q0 52 21 98.5t60 81.5q-1-5-1-9v-9q0-32 12-60t35-51l113-111 113 111q23 23 35 51t12 60v9q0 4-1 9 39-35 60-81.5t21-98.5q0-50-18.5-94.5T648-574q-20 13-42 19.5t-45 6.5q-62 0-107.5-41T401-690q-78 66-119.5 140.5T240-400Zm240 52-57 56q-11 11-17 25t-6 29q0 32 23.5 55t56.5 23q33 0 56.5-23t23.5-55q0-16-6-29.5T537-292l-57-56Z" /></svg>Clear editor
+</div>
+<div class="setting-sub">
+Remove all code from editor
+</div>
+</div>
+</div>
+<div style="padding: 8px 16px 16px;">
+<button class="clear-btn" id="clear-all-btn"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="currentColor" style="flex-shrink:0;"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z" /></svg> Clear Everything</button>
+</div>
+</div>
+
+<div class="settings-section-title">
+Snippets
+</div>
+<div class="settings-card" id="snippets-list">
+<!-- Populated by JS -->
+</div>
+</div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="panel" id="panel-settings">
+<div class="settings-panel">
+<div class="settings-section-title">
+Appearance
+</div>
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+Theme
+</div>
+<div class="setting-sub">
+Switch between dark and light mode
+</div>
+</div>
+</div>
+<div class="theme-pills">
+<div class="theme-pill active" data-theme="dark">
+Dark
+</div>
+<div class="theme-pill" data-theme="light">
+Light
+</div>
+</div>
+</div>
+
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+Font Size
+</div>
+<div class="setting-sub">
+Editor and output font size
+</div>
+</div>
+<select class="m3-select" id="font-size-select">
+<option value="11">11px</option>
+<option value="12">12px</option>
+<option value="13" selected>13px (default)</option>
+<option value="14">14px</option>
+<option value="15">15px</option>
+<option value="16">16px</option>
+</select>
+</div>
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+Line Numbers
+</div>
+<div class="setting-sub">
+Show line numbers in editor
+</div>
+</div>
+<button class="m3-switch on" id="toggle-line-numbers" role="switch" aria-checked="true">
+<div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960" fill="#381E72"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
+</button>
+</div>
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+Autocomplete
+</div>
+<div class="setting-sub">
+Show suggestions while typing
+</div>
+</div>
+<button class="m3-switch on" id="toggle-autocomplete" role="switch" aria-checked="true">
+<div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960" fill="#381E72"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
+</button>
+</div>
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+Auto-indent
+</div>
+<div class="setting-sub">
+Smart indentation on Enter
+</div>
+</div>
+<button class="m3-switch on" id="toggle-indent" role="switch" aria-checked="true">
+<div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960" fill="#381E72"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
+</button>
+</div>
+</div>
+
+<div class="settings-section-title">
+About
+</div>
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">
+PyPad v1.1
+</div>
+<div class="setting-sub">
+Built with  💜 by Bhuwan. Thanks to claude.<br>
+This project stands with  Palestine 🇵🇸
+</div>
+</div>
+<span style="display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="28" height="28"><defs><linearGradient id="pyBlue2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#387EB8"/><stop offset="100%" style="stop-color:#366994"/></linearGradient><linearGradient id="pyYellow2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FFE052"/><stop offset="100%" style="stop-color:#FFC331"/></linearGradient></defs><path fill="url(#pyBlue2)" d="M54.9,4.6c-27.3,0-25.6,11.9-25.6,11.9l0,12.3h26v3.7H20.9c0,0-17.4-2-17.4,25.6s15.2,24.9,15.2,24.9h9.1V70.7c0,0-0.5-15.2,14.9-15.2h25.7c0,0,14.4,0.2,14.4-13.9V18.3C82.8,18.3,84.9,4.6,54.9,4.6z M40.5,12.2c2.6,0,4.7,2.1,4.7,4.7s-2.1,4.7-4.7,4.7s-4.7-2.1-4.7-4.7S37.9,12.2,40.5,12.2z"/><path fill="url(#pyYellow2)" d="M55.5,105.4c27.3,0,25.6-11.9,25.6-11.9l0-12.3h-26v-3.7h34.4c0,0,17.4,2,17.4-25.6S91.7,27,91.7,27h-9.1v12.3c0,0,0.5,15.2-14.9,15.2H42c0,0-14.4-0.2-14.4,13.9v23.3C27.6,91.7,25.5,105.4,55.5,105.4z M69.9,97.8c-2.6,0-4.7-2.1-4.7-4.7s2.1-4.7,4.7-4.7s4.7,2.1,4.7,4.7S72.5,97.8,69.9,97.8z"/></svg></span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CONSOLE MINI FAB -->
+<button class="console-fab" id="console-fab" title="Show output" aria-label="Show output">
+<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H160v400Zm0 0v-400 400Zm80-120q-17 0-28.5-11.5T200-400q0-17 11.5-28.5T240-440h160q17 0 28.5 11.5T440-400q0 17-11.5 28.5T400-360H240Zm0-120q-17 0-28.5-11.5T200-520q0-17 11.5-28.5T240-560h480q17 0 28.5 11.5T760-520q0 17-11.5 28.5T720-480H240Z" /></svg>
+<div class="output-badge"></div>
+</button>
+
+<!-- RUN FAB -->
+<button class="run-fab" id="run-fab" title="Run code (Ctrl+Enter)" aria-label="Run code">
+<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M360-272q-17 0-28.5-11.5T320-312v-336q0-17 11.5-28.5T360-688q6 0 11 1.5t10 4.5l336 168q14 7 14 22.5T717-469L381-301q-5 3-10 4.5t-11 1.5Z" /></svg>
+</button>
+
+<!-- AUTOCOMPLETE -->
+<div id="autocomplete-box"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottom-nav">
+<button class="nav-item active" data-panel="editor">
+<div class="nav-indicator"></div>
+<span class="nav-icon"><svg id="icon-editor-nav" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="#CAC4D0"><path d="m153-480 115 115q11 12 11.5 28.5T268-308q-12 12-28 12t-28-12L68-452q-12-12-12-28t12-28l144-144q12-12 28-12t28 12q12 12 12 28.5T268-595L153-480Zm203.5 300.5Q349-194 354-210l176-564q5-16 19.5-23.5T580-800q16 5 23.5 19.5T606-750L430-186q-5 16-19.5 23.5T380-160q-16-5-23.5-19.5ZM807-480 692-595q-12-12-12-28.5t12-28.5q12-12 28-12t28 12l144 144q12 12 12 28t-12 28L748-308q-12 12-28 12t-28-12q-12-12-12-28.5t12-28.5l115-115Z" /></svg></span>
+<span class="nav-label">Editor</span>
+</button>
+<button class="nav-item" data-panel="export">
+<div class="nav-indicator"></div>
+<span class="nav-icon"><svg id="icon-export-nav" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="#CAC4D0"><path d="M480-480ZM320-183l-90 90q-12 12-28 11.5T174-94q-11-12-11.5-28t11.5-28l90-90h-50q-17 0-28.5-11.5T174-280q0-17 11.5-28.5T214-320h146q17 0 28.5 11.5T400-280v146q0 17-11.5 28.5T360-94q-17 0-28.5-11.5T320-134v-49ZM171.5-411.5Q160-423 160-440v-360q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H520q-17 0-28.5-11.5T480-120q0-17 11.5-28.5T520-160h200v-440H560q-17 0-28.5-11.5T520-640v-160H240v360q0 17-11.5 28.5T200-400q-17 0-28.5-11.5Z" /></svg></span>
+<span class="nav-label">Export</span>
+</button>
+<button class="nav-item" data-panel="settings">
+<div class="nav-indicator"></div>
+<span class="nav-icon">
+<svg xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="currentColor">
+<path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z" />
+</svg>
+</span>
+<span class="nav-label">Settings</span>
+</button>
+</nav>
+
+</div>
+
+<!-- SNACKBAR -->
+<div id="snackbar"></div>
+
+<script>
+// ============================================================
+//  PYTHON KEYWORDS + BUILTINS FOR AUTOCOMPLETE
+// ============================================================
+const PY_KEYWORDS = [
+'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break',
+'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally',
+'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal',
+'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'
+];
+const PY_BUILTINS = [
+'abs', 'all', 'any', 'ascii', 'bin', 'bool', 'breakpoint', 'bytearray', 'bytes',
+'callable', 'chr', 'classmethod', 'compile', 'complex', 'copyright', 'credits',
+'delattr', 'dict', 'dir', 'divmod', 'enumerate', 'eval', 'exec', 'exit', 'filter',
+'float', 'format', 'frozenset', 'getattr', 'globals', 'hasattr', 'hash', 'help',
+'hex', 'id', 'input', 'int', 'isinstance', 'issubclass', 'iter', 'len', 'license',
+'list', 'locals', 'map', 'max', 'memoryview', 'min', 'next', 'object', 'oct', 'open',
+'ord', 'pow', 'print', 'property', 'quit', 'range', 'repr', 'reversed', 'round',
+'set', 'setattr', 'slice', 'sorted', 'staticmethod', 'str', 'sum', 'super', 'tuple',
+'type', 'vars', 'zip'
+];
+const PY_SNIPPETS = [
+{ name: 'for loop', code: 'for i in range(10):\n    print(i)', badge: 'sn' },
+{ name: 'while loop', code: 'while True:\n    break', badge: 'sn' },
+{ name: 'function def', code: 'def my_function(x):\n    return x * 2', badge: 'sn' },
+{ name: 'class def', code: 'class MyClass:\n    def __init__(self):\n        pass', badge: 'sn' },
+{ name: 'list comp', code: 'result = [x**2 for x in range(10)]\nprint(result)', badge: 'sn' },
+{ name: 'try/except', code: 'try:\n    pass\nexcept Exception as e:\n    print(e)', badge: 'sn' },
+{ name: 'dict demo', code: "d = {'a': 1, 'b': 2}\nfor k, v in d.items():\n    print(k, v)", badge: 'sn' },
+{ name: 'fibonacci', code: 'def fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        print(a)\n        a, b = b, a+b\nfib(10)', badge: 'sn' },
+];
+
+// Build combined list
+const ALL_COMPLETIONS = [
+...PY_KEYWORDS.map(w=>({name: w, badge: 'kw'})),
+...PY_BUILTINS.map(w=>({name: w, badge: 'bi'})),
+];
+
+// ============================================================
+//  STATE
+// ============================================================
+const state = {
+theme: 'dark',
+fontSize: 13,
+showLineNumbers: true,
+autocompleteEnabled: true,
+autoIndentEnabled: true,
+acIndex: -1,
+acItems: [],
+isRunning: false,
+skulptReady: false
+};
+
+// ============================================================
+//  DOM REFS
+// ============================================================
+const codeInput = document.getElementById('code-input');
+const highlightLayer = document.getElementById('highlight-layer');
+const lineNumbers = document.getElementById('line-numbers');
+const outputEl = document.getElementById('output');
+const acBox = document.getElementById('autocomplete-box');
+const runFab = document.getElementById('run-fab');
+const statusDot = document.getElementById('status-dot');
+const snackbar = document.getElementById('snackbar');
+const outputSection = document.getElementById('output-section');
+const resizeHandle = document.getElementById('resize-handle');
+
+// ============================================================
+//  SYNTAX HIGHLIGHTING
+// ============================================================
+function escapeHtml(s) {
+return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function highlightPython(code) {
+const lines = code.split('\n');
+return lines.map(line => {
+let html = '';
+let i = 0;
+const L = line.length;
+
+while (i < L) {
+// Comment
+if (line[i] === '#') {
+html += `<span class="syn-comment">${escapeHtml(line.slice(i))}</span>`;
+break;
+}
+// Triple string
+if ((line[i] === "'" && line[i+1] === "'" && line[i+2] === "'") ||
+(line[i] === '"' && line[i+2] === '"' && line[i+1] === '"')) {
+const q = line[i].repeat(3);
+let end = line.indexOf(q, i+3);
+if (end === -1) end = L;
+else end += 3;
+html += `<span class="syn-string">${escapeHtml(line.slice(i, end))}</span>`;
+i = end; continue;
+}
+// String
+if (line[i] === "'" || line[i] === '"') {
+const q = line[i];
+let j = i+1;
+while (j < L && line[j] !== q) {
+if (line[j] === '\\') j++;
+j++;
+}
+j++;
+html += `<span class="syn-string">${escapeHtml(line.slice(i, j))}</span>`;
+i = j; continue;
+}
+// Decorator
+if (line[i] === '@' && (i === 0 || /\s/.test(line[i-1]))) {
+let j = i+1;
+while (j < L && /[\w.]/.test(line[j])) j++;
+html += `<span class="syn-decorator">${escapeHtml(line.slice(i, j))}</span>`;
+i = j; continue;
+}
+// Number
+if (/[0-9]/.test(line[i]) && (i === 0 || !/\w/.test(line[i-1]))) {
+let j = i;
+while (j < L && /[0-9._xXbBoOeEjJ]/.test(line[j])) j++;
+html += `<span class="syn-number">${escapeHtml(line.slice(i, j))}</span>`;
+i = j; continue;
+}
+// Word
+if (/[a-zA-Z_]/.test(line[i])) {
+let j = i;
+while (j < L && /\w/.test(line[j])) j++;
+const word = line.slice(i, j);
+// Check next non-space for '('
+let peek = j;
+while (peek < L && line[peek] === ' ') peek++;
+const isCall = line[peek] === '(';
+
+if (word === 'self' || word === 'cls') {
+html += `<span class="syn-self">${word}</span>`;
+} else if (['True', 'False'].includes(word)) {
+html += `<span class="syn-bool">${word}</span>`;
+} else if (word === 'None') {
+html += `<span class="syn-none">${word}</span>`;
+} else if (PY_KEYWORDS.includes(word)) {
+const klass = (word === 'def' || word === 'class') ? 'syn-keyword': 'syn-keyword';
+html += `<span class="${klass}">${word}</span>`;
+} else if (PY_BUILTINS.includes(word)) {
+html += `<span class="syn-builtin">${word}</span>`;
+} else if (isCall) {
+// Look behind for 'class ' to detect class name
+const prefix = line.slice(0, i).trimEnd();
+if (/\bclass\s*$/.test(prefix) || /\bclass$/.test(prefix)) {
+html += `<span class="syn-class-name">${word}</span>`;
+} else {
+html += `<span class="syn-function">${word}</span>`;
+}
+} else if (/^[A-Z]/.test(word)) {
+html += `<span class="syn-class-name">${word}</span>`;
+} else {
+html += `<span class="syn-default">${escapeHtml(word)}</span>`;
+}
+i = j; continue;
+}
+// Operator + brackets — everything gets a span so nothing is invisible
+if (/[+\-*\/%=<>!&|^~:,.(\)[\]{}]/.test(line[i])) {
+const isBracket = /[()\[\]{}]/.test(line[i]);
+const cls = isBracket ? 'syn-bracket': 'syn-operator';
+html += `<span class="${cls}">${escapeHtml(line[i])}</span>`;
+i++; continue;
+}
+
+// catch-all: always wrap so transparent fill does not hide it
+html += `<span class="syn-default">${escapeHtml(line[i])}</span>`;
+i++;
+}
+return html;
+}).join('\n');
+}
+
+function updateHighlight() {
+const code = codeInput.value;
+highlightLayer.innerHTML = highlightPython(code) + '\n';
+updateLineNumbers(code);
+}
+
+// ============================================================
+//  LINE NUMBERS
+// ============================================================
+function updateLineNumbers(code) {
+if (!state.showLineNumbers) { lineNumbers.style.display = 'none'; return; }
+lineNumbers.style.display = '';
+const count = (code.match(/\n/g) || []).length + 1;
+lineNumbers.textContent = Array.from({length: count}, (_,i)=>i+1).join('\n');
+}
+
+// ============================================================
+//  SCROLL SYNC
+// ============================================================
+function syncScroll() {
+highlightLayer.style.transform = `translateY(-${codeInput.scrollTop}px) translateX(-${codeInput.scrollLeft}px)`;
+lineNumbers.style.transform = `translateY(-${codeInput.scrollTop}px)`;
+}
+codeInput.addEventListener('scroll', syncScroll);
+
+// ============================================================
+//  AUTOCOMPLETE
+// ============================================================
+function getWordBeforeCursor() {
+const pos = codeInput.selectionStart;
+const text = codeInput.value.slice(0, pos);
+const m = text.match(/[\w]+$/);
+return m ? m[0]: '';
+}
+
+function showAutocomplete() {
+if (!state.autocompleteEnabled) return;
+const word = getWordBeforeCursor();
+if (word.length < 1) { hideAC(); return; }
+
+const matches = ALL_COMPLETIONS.filter(c =>
+c.name.startsWith(word) && c.name !== word
+).slice(0, 8);
+
+if (!matches.length) { hideAC(); return; }
+state.acItems = matches;
+state.acIndex = -1;
+
+acBox.innerHTML = matches.map((m, i) => `
+<div class="ac-item" data-idx="${i}" data-name="${m.name}">
+<span class="ac-badge ${m.badge}">${m.badge.toUpperCase()}</span>
+<span class="ac-name">${m.name}</span>
+</div>
+`).join('');
+
+// Position the box near cursor
+const coords = getCaretCoords();
+const boxW = 220;
+const vpW = window.innerWidth;
+const vpH = window.innerHeight;
+let left = Math.min(coords.x, vpW - boxW - 8);
+let top = coords.y + 20;
+if (top + 200 > vpH) top = coords.y - 210;
+
+acBox.style.left = left + 'px';
+acBox.style.top = top  + 'px';
+acBox.style.display = 'block';
+
+acBox.querySelectorAll('.ac-item').forEach(el => {
+el.addEventListener('mousedown', e => {
+e.preventDefault();
+applyAC(el.dataset.name);
+});
+el.addEventListener('touchend', e => {
+e.preventDefault();
+applyAC(el.dataset.name);
+});
+});
+}
+
+function hideAC() {
+acBox.style.display = 'none';
+state.acItems = [];
+state.acIndex = -1;
+}
+
+function applyAC(name) {
+const pos = codeInput.selectionStart;
+const text = codeInput.value;
+const before = text.slice(0, pos);
+const after = text.slice(pos);
+const m = before.match(/[\w]+$/);
+const word = m ? m[0]: '';
+const newBefore = before.slice(0, before.length - word.length) + name;
+codeInput.value = newBefore + after;
+const newPos = newBefore.length;
+codeInput.setSelectionRange(newPos, newPos);
+updateHighlight();
+hideAC();
+codeInput.focus();
+}
+
+// Rough caret position estimator
+function getCaretCoords() {
+const rect = codeInput.getBoundingClientRect();
+const text = codeInput.value.slice(0, codeInput.selectionStart);
+const lines = text.split('\n');
+const lineNum = lines.length - 1;
+const colNum = lines[lines.length - 1].length;
+const lineH = parseFloat(getComputedStyle(codeInput).lineHeight) || 22;
+const charW = parseFloat(getComputedStyle(codeInput).fontSize) * 0.6;
+const padL = 8;
+const padT = 12;
+return {
+x: rect.left + padL + colNum * charW - codeInput.scrollLeft,
+y: rect.top + padT + lineNum * lineH - codeInput.scrollTop
+};
+}
+
+// ============================================================
+//  AUTO INDENT
+// ============================================================
+function handleEnter() {
+if (!state.autoIndentEnabled) return false;
+const pos = codeInput.selectionStart;
+const text = codeInput.value;
+const before = text.slice(0, pos);
+const after = text.slice(pos);
+
+const lines = before.split('\n');
+const currentLine = lines[lines.length - 1];
+const indent = currentLine.match(/^(\s*)/)[1];
+
+// Increase indent after colon
+const extraIndent = /:\s*$/.test(currentLine.trimEnd()) ? '    ': '';
+const insert = '\n' + indent + extraIndent;
+
+codeInput.value = before + insert + after;
+const newPos = pos + insert.length;
+codeInput.setSelectionRange(newPos, newPos);
+updateHighlight();
+return true;
+}
+
+// ============================================================
+//  KEYBOARD HANDLER
+// ============================================================
+codeInput.addEventListener('keydown', e => {
+// Ctrl+Enter → run
+if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+e.preventDefault();
+runCode();
+return;
+}
+
+// Autocomplete navigation
+if (acBox.style.display !== 'none' && state.acItems.length) {
+if (e.key === 'ArrowDown') {
+e.preventDefault();
+state.acIndex = Math.min(state.acIndex + 1, state.acItems.length - 1);
+renderACSelection(); return;
+}
+if (e.key === 'ArrowUp') {
+e.preventDefault();
+state.acIndex = Math.max(state.acIndex - 1, 0);
+renderACSelection(); return;
+}
+if (e.key === 'Tab' || e.key === 'Enter') {
+if (state.acIndex >= 0) {
+e.preventDefault();
+applyAC(state.acItems[state.acIndex].name); return;
+}
+if (e.key === 'Tab') { e.preventDefault(); insertTab(); return; }
+if (e.key === 'Enter') { e.preventDefault(); if (handleEnter()) return; }
+}
+if (e.key === 'Escape') { hideAC(); return; }
+}
+
+// Tab → 4 spaces
+if (e.key === 'Tab') {
+e.preventDefault();
+// Check if there's a selection for block indent
+const start = codeInput.selectionStart;
+const end = codeInput.selectionEnd;
+if (start !== end) {
+blockIndent(e.shiftKey); return;
+}
+if (!state.acItems.length) insertTab(); return;
+}
+
+// Enter → auto indent
+if (e.key === 'Enter') {
+e.preventDefault();
+hideAC();
+handleEnter();
+return;
+}
+
+// Closing bracket auto-pair check: if backspace on empty line with indent
+if (e.key === 'Backspace') {
+hideAC();
+}
+});
+
+function insertTab() {
+const pos = codeInput.selectionStart;
+const text = codeInput.value;
+codeInput.value = text.slice(0, pos) + '    ' + text.slice(pos);
+codeInput.setSelectionRange(pos+4, pos+4);
+updateHighlight();
+}
+
+function blockIndent(unindent) {
+const start = codeInput.selectionStart;
+const end = codeInput.selectionEnd;
+const text = codeInput.value;
+
+const lineStart = text.lastIndexOf('\n', start-1) + 1;
+const lineEnd = text.indexOf('\n', end);
+const block = text.slice(lineStart, lineEnd === -1 ? text.length: lineEnd);
+
+const newBlock = block.split('\n').map(l =>
+unindent ? l.replace(/^    /, ''): '    ' + l
+).join('\n');
+
+codeInput.value = text.slice(0, lineStart) + newBlock + (lineEnd === -1 ? '': text.slice(lineEnd));
+updateHighlight();
+}
+
+function renderACSelection() {
+acBox.querySelectorAll('.ac-item').forEach((el,i) => {
+el.classList.toggle('selected', i === state.acIndex);
+});
+const sel = acBox.querySelector('.selected');
+if (sel) sel.scrollIntoView({block: 'nearest'});
+}
+
+codeInput.addEventListener('input', () => {
+updateHighlight();
+showAutocomplete();
+});
+
+// ============================================================
+//  PYTHON RUNNER (SKULPT)
+// ============================================================
+function setStatus(s) {
+statusDot.className = 'status-dot ' + s;
+}
+
+function appendOutput(text, cls = '') {
+const span = document.createElement('span');
+span.className = 'out-line' + (cls ? ' ' + cls: '');
+span.textContent = text;
+outputEl.appendChild(span);
+outputEl.appendChild(document.createTextNode('\n'));
+outputEl.scrollTop = outputEl.scrollHeight;
+if (cls !== 'info') markOutputBadge();
+}
+
+function runCode() {
+if (state.isRunning) return;
+const code = codeInput.value.trim();
+if (!code) { showSnack('✏️ Nothing to run!'); return; }
+
+state.isRunning = true;
+runFab.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M240-320v-320q0-33 23.5-56.5T320-720h320q33 0 56.5 23.5T720-640v320q0 33-23.5 56.5T640-240H320q-33 0-56.5-23.5T240-320Z"/></svg>';
+runFab.classList.add('running');
+setStatus('running');
+
+outputEl.innerHTML = '';
+appendOutput('▶  Running…', 'system');
+
+// FAB ripple
+const ripple = document.createElement('div');
+ripple.className = 'fab-ripple';
+ripple.style.cssText = 'width:56px;height:56px;left:0;top:0;';
+runFab.appendChild(ripple);
+setTimeout(() => ripple.remove(), 500);
+
+// Wait for Skulpt to load (async CDN), retry up to 5s
+if (typeof Sk === 'undefined') {
+appendOutput('⏳  Loading Python engine…', 'info');
+let attempts = 0;
+const wait = setInterval(() => {
+attempts++;
+if (typeof Sk !== 'undefined') {
+clearInterval(wait);
+outputEl.innerHTML = '';
+appendOutput('▶  Running…', 'system');
+execWithSkulpt(code);
+} else if (attempts > 25) {
+clearInterval(wait);
+outputEl.innerHTML = '';
+appendOutput('❌  Python engine failed to load.', 'error');
+appendOutput('   • Check your internet connection 📡', 'error');
+appendOutput('   • Try refreshing the page 🔄', 'error');
+resetFab();
+}
+}, 200);
+return;
+}
+
+execWithSkulpt(code);
+}
+
+function execWithSkulpt(code) {
+Sk.configure({
+output: txt => {
+const lines = txt.split('\n');
+lines.forEach((l, i) => {
+if (i < lines.length - 1 || l !== '') appendOutput(l);
+});
+},
+read: file => {
+if (Sk.builtinFiles && Sk.builtinFiles.files[file] !== undefined)
+return Sk.builtinFiles.files[file];
+throw new Error(`File not found: '${file}'`);
+},
+__future__: Sk.python3,
+inputfun: prompt => window.prompt(prompt || 'Input:') || '',
+inputfunTakesPrompt: true,
+execLimit: 10000
+});
+
+const promise = Sk.misceval.asyncToPromise(() =>
+Sk.importMainWithBody('<stdin>', false, code, true)
+);
+
+promise.then(() => {
+setStatus('success');
+appendOutput('✅  Done', 'success');
+resetFab();
+}).catch(err => {
+setStatus('error');
+const msg = err.toString().replace('Traceback (most recent call last):\n', '');
+appendOutput('❌  ' + msg, 'error');
+resetFab();
+});
+}
+
+function resetFab() {
+state.isRunning = false;
+runFab.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M360-272q-17 0-28.5-11.5T320-312v-336q0-17 11.5-28.5T360-688q6 0 11 1.5t10 4.5l336 168q14 7 14 22.5T717-469L381-301q-5 3-10 4.5t-11 1.5Z"/></svg>';
+runFab.classList.remove('running');
+setTimeout(() => setStatus(''), 3000);
+}
+
+runFab.addEventListener('click', runCode);
+
+// ============================================================
+//  BOTTOM NAV
+// ============================================================
+document.getElementById('bottom-nav').querySelectorAll('.nav-item').forEach(btn => {
+btn.addEventListener('click', () => {
+document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+btn.classList.add('active');
+const panel = document.getElementById('panel-' + btn.dataset.panel);
+if (panel) panel.classList.add('active');
+runFab.style.display = btn.dataset.panel === 'editor' ? '': 'none';
+});
+});
+
+// ============================================================
+//  RESIZE HANDLE
+// ============================================================
+let resizing = false, resizeStartY = 0, resizeStartH = 0;
+
+resizeHandle.addEventListener('mousedown', startResize);
+resizeHandle.addEventListener('touchstart', e => startResize(e.touches[0]), {passive: true});
+
+function startResize(e) {
+resizing = true;
+resizeStartY = e.clientY;
+resizeStartH = outputSection.offsetHeight;
+resizeHandle.classList.add('dragging');
+document.addEventListener('mousemove', doResize);
+document.addEventListener('mouseup', endResize);
+document.addEventListener('touchmove', e => doResize(e.touches[0]), {passive: true});
+document.addEventListener('touchend', endResize);
+}
+
+function doResize(e) {
+if (!resizing) return;
+const delta = resizeStartY - e.clientY;
+const newH = Math.max(80, Math.min(resizeStartH + delta, window.innerHeight * 0.65));
+outputSection.style.height = newH + 'px';
+checkCollapsed();
+}
+
+function endResize() {
+resizing = false;
+resizeHandle.classList.remove('dragging');
+document.removeEventListener('mousemove', doResize);
+document.removeEventListener('mouseup', endResize);
+checkCollapsed();
+}
+
+// ============================================================
+//  CONSOLE MINI FAB
+// ============================================================
+const consoleFab = document.getElementById('console-fab');
+const COLLAPSE_THRESHOLD = 82; // px — basically at min-height
+const EXPANDED_H = 200; // restore height
+
+function checkCollapsed() {
+const h = outputSection.offsetHeight;
+const isCollapsed = h <= COLLAPSE_THRESHOLD;
+consoleFab.classList.toggle('visible', isCollapsed);
+}
+
+// tap console FAB → expand output panel back up
+consoleFab.addEventListener('click', () => {
+outputSection.style.transition = 'height var(--motion-duration-long) var(--motion-emphasized)';
+outputSection.style.height = EXPANDED_H + 'px';
+consoleFab.classList.remove('visible');
+setTimeout(() => {
+outputSection.style.transition = '';
+}, 500);
+});
+
+// mark console fab with badge dot when there's real output
+function markOutputBadge() {
+consoleFab.classList.add('has-output');
+}
+
+// also allow collapsing by double-tapping the resize handle
+resizeHandle.addEventListener('dblclick', () => {
+const h = outputSection.offsetHeight;
+if (h > COLLAPSE_THRESHOLD) {
+outputSection.style.transition = 'height var(--motion-duration-medium) var(--motion-emphasized)';
+outputSection.style.height = '80px';
+setTimeout(() => { outputSection.style.transition = ''; checkCollapsed(); }, 400);
+} else {
+outputSection.style.transition = 'height var(--motion-duration-long) var(--motion-emphasized)';
+outputSection.style.height = EXPANDED_H + 'px';
+consoleFab.classList.remove('visible');
+setTimeout(() => { outputSection.style.transition = ''; }, 500);
+}
+});
+
+// ============================================================
+//  THEME TOGGLE
+// ============================================================
+function setTheme(t) {
+state.theme = t;
+document.body.classList.toggle('light-theme', t === 'light');
+const sun = document.getElementById('icon-sun');
+const moon = document.getElementById('icon-moon');
+if (t === 'dark') {
+// dark mode → show sun (to let user switch to light)
+sun.style.display = 'block';
+sun.setAttribute('fill', '#CAC4D0');
+moon.style.display = 'none';
+} else {
+// light mode → show moon (to let user switch to dark)
+moon.style.display = 'block';
+moon.setAttribute('fill', '#49454F');
+sun.style.display = 'none';
+}
+document.querySelectorAll('.theme-pill').forEach(p => {
+p.classList.toggle('active', p.dataset.theme === t);
+});
+// update clear icon fills for theme
+const clearFill = t === 'dark' ? '#CAC4D0': '#49454F';
+document.querySelectorAll('#clear-code-btn svg, #clear-output-btn svg').forEach(s => s.setAttribute('fill', clearFill));
+document.querySelectorAll('#icon-export-nav, #icon-editor-nav').forEach(s => s.setAttribute('fill', clearFill));
+localStorage.setItem('pypad-theme', t);
+}
+
+document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+setTheme(state.theme === 'dark' ? 'light': 'dark');
+});
+
+document.querySelectorAll('.theme-pill').forEach(p => {
+p.addEventListener('click', () => setTheme(p.dataset.theme));
+});
+
+// ============================================================
+//  SETTINGS SWITCHES
+// ============================================================
+function initSwitch(id, stateKey, callback) {
+  const sw = document.getElementById(id);
+  sw.addEventListener('click', () => {
+    state[stateKey] = !state[stateKey];
+    const isOn = state[stateKey];
+    const check = sw.querySelector('.switch-check');
+    if (!isOn && check) {
+      // hide checkmark IMMEDIATELY before thumb slides away
+      check.style.transition = 'none';
+      check.style.opacity = '0';
+    }
+    sw.classList.toggle('on', isOn);
+    sw.setAttribute('aria-checked', isOn);
+    if (isOn && check) {
+      // show checkmark AFTER thumb finishes sliding in
+      check.style.transition = '';
+      // small delay so it fades in once thumb is in position
+      setTimeout(() => { check.style.opacity = '1'; }, 180);
+    }
+    if (callback) callback(isOn);
+  });
+}
+
+initSwitch('toggle-line-numbers', 'showLineNumbers', v => {
+lineNumbers.style.display = v ? '': 'none';
+updateLineNumbers(codeInput.value);
+});
+initSwitch('toggle-autocomplete', 'autocompleteEnabled', v => {
+if (!v) hideAC();
+});
+initSwitch('toggle-indent', 'autoIndentEnabled');
+
+// Font size
+document.getElementById('font-size-select').addEventListener('change', e => {
+const sz = e.target.value + 'px';
+codeInput.style.fontSize = sz;
+highlightLayer.style.fontSize = sz;
+lineNumbers.style.fontSize = (parseInt(e.target.value)-1) + 'px';
+document.getElementById('output').style.fontSize = sz;
+state.fontSize = parseInt(e.target.value);
+});
+
+// ============================================================
+//  EXPORT
+// ============================================================
+document.getElementById('export-py-btn').addEventListener('click', () => {
+const code = codeInput.value;
+if (!code.trim()) { showSnack('✏️ Editor is empty!'); return; }
+const blob = new Blob([code], {type: 'text/x-python'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'main.py';
+a.click();
+URL.revokeObjectURL(url);
+showSnack('✅ Downloaded main.py!');
+});
+
+document.getElementById('copy-btn').addEventListener('click', async () => {
+const code = codeInput.value;
+if (!code.trim()) { showSnack('✏️ Nothing to copy!'); return; }
+try {
+await navigator.clipboard.writeText(code);
+showSnack('✅ Copied to clipboard!');
+} catch {
+// fallback
+codeInput.select();
+document.execCommand('copy');
+showSnack('✅ Copied!');
+}
+});
+
+document.getElementById('clear-all-btn').addEventListener('click', () => {
+if (!codeInput.value.trim()) { showSnack('📭 Already empty!'); return; }
+codeInput.value = '';
+updateHighlight();
+outputEl.innerHTML = '<span class="out-line info">Cleared. Ready 🐍</span>';
+setStatus('');
+showSnack('✅ Cleared!');
+});
+
+document.getElementById('clear-code-btn').addEventListener('click', () => {
+codeInput.value = '';
+updateHighlight();
+showSnack('✅ Editor cleared');
+});
+
+document.getElementById('clear-output-btn').addEventListener('click', () => {
+outputEl.innerHTML = '<span class="out-line info">Output cleared.</span>';
+setStatus('');
+consoleFab.classList.remove('has-output');
+});
+
+// ============================================================
+//  SNIPPETS LIST
+// ============================================================
+const snippetsList = document.getElementById('snippets-list');
+PY_SNIPPETS.forEach(sn => {
+const row = document.createElement('div');
+row.className = 'setting-row';
+row.style.cursor = 'pointer';
+row.innerHTML = `
+<div class="setting-info">
+<div class="setting-label">${sn.name}</div>
+<div class="setting-sub" style="font-family:'JetBrains Mono',monospace;font-size:11px;">${sn.code.split('\n')[0]}…</div>
+</div>
+<span style="display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="#CAC4D0"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z"/></svg></span>
+`;
+row.addEventListener('click', () => {
+const cur = codeInput.value;
+codeInput.value = cur + (cur && !cur.endsWith('\n') ? '\n': '') + sn.code + '\n';
+updateHighlight();
+showSnack(`✅ Inserted: ${sn.name}`);
+// Switch to editor
+document.querySelector('[data-panel="editor"]').click();
+});
+snippetsList.appendChild(row);
+});
+
+// ============================================================
+//  SNACKBAR
+// ============================================================
+let snackTimer;
+function showSnack(msg) {
+snackbar.textContent = msg;
+snackbar.classList.add('show');
+clearTimeout(snackTimer);
+snackTimer = setTimeout(() => snackbar.classList.remove('show'), 2500);
+}
+
+// ============================================================
+//  HIDE AC ON OUTSIDE CLICK
+// ============================================================
+document.addEventListener('mousedown', e => {
+if (!acBox.contains(e.target) && e.target !== codeInput) hideAC();
+});
+document.addEventListener('touchstart', e => {
+if (!acBox.contains(e.target) && e.target !== codeInput) hideAC();
+}, {passive: true});
+
+// ============================================================
+//  INITIAL CODE
+// ============================================================
+codeInput.value = '';
+updateHighlight();
+
+// ============================================================
+//  LOAD SAVED THEME
+// ============================================================
+const savedTheme = localStorage.getItem('pypad-theme') || 'dark';
+setTheme(savedTheme);
+
+// ============================================================
+//  PREVENT DEFAULT TOUCH SCROLL ON EDITOR
+// ============================================================
+// Allow native scroll in textarea, prevent body bounce
+document.body.addEventListener('touchmove', e => {
+if (!codeInput.contains(e.target) && !outputEl.contains(e.target)) {
+e.preventDefault();
+}
+}, {passive: false});
+
+</script>
+</body>
+</html>
