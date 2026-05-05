@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>PyPad — Python Interpreter</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;icon_names=settings" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=settings" />
 <script>
 // Load Skulpt with fallback CDN chain
 (function() {
@@ -50,42 +49,43 @@ console.error('Skulpt core failed to load from all CDNs');
 <style>
 /* ============================================
      M3 EXPRESSIVE — DESIGN TOKENS
-     🌿 GREEN seed: #568200 
-     🟡 YELLOW seed: #F6CC1E
+     🌿 PRIMARY: #7AD8BF (teal-mint green)
+     🟡 SECONDARY: #FCF721 (golden ginkgo yellow)
   ============================================ */
 :root {
---md-sys-color-primary: #9CD134;
---md-sys-color-on-primary: #141E01;
---md-sys-color-primary-container: #385108;
---md-sys-color-on-primary-container: #BAE567;
---md-sys-color-secondary: #F4D13E;
---md-sys-color-on-secondary: #1E1903;
---md-sys-color-secondary-container: #5B4E17;
---md-sys-color-on-secondary-container: #F9E48C;
---md-sys-color-tertiary: #A0CFA0;
---md-sys-color-on-tertiary: #0A2210;
---md-sys-color-tertiary-container: #1E4228;
---md-sys-color-on-tertiary-container: #BCEBC0;
---md-sys-color-error: #F2B8B5;
---md-sys-color-on-error: #601410;
---md-sys-color-error-container: #8C1D18;
---md-sys-color-on-error-container: #F9DEDC;
---md-sys-color-background: #0E1205;
---md-sys-color-on-background: #DDE6CC;
---md-sys-color-surface: #0E1205;
---md-sys-color-on-surface: #DDE6CC;
---md-sys-color-surface-variant: #3A4728;
---md-sys-color-on-surface-variant: #BACAAA;
---md-sys-color-outline: #849070;
---md-sys-color-outline-variant: #3A4728;
---md-sys-color-surface-container-lowest: #090D02;
---md-sys-color-surface-container-low: #161B0A;
---md-sys-color-surface-container: #1B200D;
---md-sys-color-surface-container-high: #252B17;
---md-sys-color-surface-container-highest: #303722;
---md-sys-color-inverse-surface: #DDE6CC;
---md-sys-color-inverse-on-surface: #2B3219;
---md-sys-color-inverse-primary: #4D7205;
+/* ── DARK THEME (default) ── */
+--md-sys-color-primary: #7AD8BF;
+--md-sys-color-on-primary: #00201A;
+--md-sys-color-primary-container: #1A4A3E;
+--md-sys-color-on-primary-container: #A0EED8;
+--md-sys-color-secondary: #FCF721;
+--md-sys-color-on-secondary: #1E1C00;
+--md-sys-color-secondary-container: #3D3A00;
+--md-sys-color-on-secondary-container: #FEFB80;
+--md-sys-color-tertiary: #A0D4C8;
+--md-sys-color-on-tertiary: #00201C;
+--md-sys-color-tertiary-container: #163C36;
+--md-sys-color-on-tertiary-container: #BBEDE4;
+--md-sys-color-error: #FFB4AB;
+--md-sys-color-on-error: #690005;
+--md-sys-color-error-container: #93000A;
+--md-sys-color-on-error-container: #FFDAD6;
+--md-sys-color-background: #0A1714;
+--md-sys-color-on-background: #C8E4DC;
+--md-sys-color-surface: #0A1714;
+--md-sys-color-on-surface: #C8E4DC;
+--md-sys-color-surface-variant: #1E3830;
+--md-sys-color-on-surface-variant: #A0C0B4;
+--md-sys-color-outline: #5A8878;
+--md-sys-color-outline-variant: #1E3830;
+--md-sys-color-surface-container-lowest: #050F0C;
+--md-sys-color-surface-container-low: #0F1F1A;
+--md-sys-color-surface-container: #152620;
+--md-sys-color-surface-container-high: #1C302A;
+--md-sys-color-surface-container-highest: #243C34;
+--md-sys-color-inverse-surface: #C8E4DC;
+--md-sys-color-inverse-on-surface: #1C302A;
+--md-sys-color-inverse-primary: #1A6650;
 --md-sys-color-scrim: #000000;
 --md-sys-color-shadow: #000000;
 
@@ -124,27 +124,50 @@ console.error('Skulpt core failed to load from all CDNs');
 }
 
 .light-theme {
---md-sys-color-primary: #4D7205;
+/* ── LIGHT THEME FULL OVERRIDE ── */
+--md-sys-color-primary: #1A6650;
 --md-sys-color-on-primary: #FFFFFF;
---md-sys-color-primary-container: #BAE567;
---md-sys-color-on-primary-container: #0F1C00;
---md-sys-color-secondary: #7A6500;
+--md-sys-color-primary-container: #A0EED8;
+--md-sys-color-on-primary-container: #002018;
+--md-sys-color-secondary: #5C5800;
 --md-sys-color-on-secondary: #FFFFFF;
---md-sys-color-secondary-container: #F9E48C;
---md-sys-color-on-secondary-container: #261E00;
---md-sys-color-background: #F5FAEC;
---md-sys-color-on-background: #181D0A;
---md-sys-color-surface: #F5FAEC;
---md-sys-color-on-surface: #181D0A;
---md-sys-color-surface-variant: #DEE8CA;
---md-sys-color-on-surface-variant: #3A4728;
---md-sys-color-outline: #697757;
---md-sys-color-outline-variant: #BACAAA;
+--md-sys-color-secondary-container: #FEFB80;
+--md-sys-color-on-secondary-container: #1A1800;
+--md-sys-color-tertiary: #1A5C54;
+--md-sys-color-on-tertiary: #FFFFFF;
+--md-sys-color-tertiary-container: #BBEDE4;
+--md-sys-color-on-tertiary-container: #002018;
+--md-sys-color-error: #BA1A1A;
+--md-sys-color-on-error: #FFFFFF;
+--md-sys-color-error-container: #FFDAD6;
+--md-sys-color-on-error-container: #410002;
+--md-sys-color-background: #EEF9F6;
+--md-sys-color-on-background: #0A1E18;
+--md-sys-color-surface: #EEF9F6;
+--md-sys-color-on-surface: #0A1E18;
+--md-sys-color-surface-variant: #CCE9E0;
+--md-sys-color-on-surface-variant: #2A4A40;
+--md-sys-color-outline: #4A7868;
+--md-sys-color-outline-variant: #A0C8BC;
 --md-sys-color-surface-container-lowest: #FFFFFF;
---md-sys-color-surface-container-low: #EFF5E5;
---md-sys-color-surface-container: #E9F0DF;
---md-sys-color-surface-container-high: #E3EAD9;
---md-sys-color-surface-container-highest: #DEE4D4;
+--md-sys-color-surface-container-low: #E4F5F0;
+--md-sys-color-surface-container: #DAEFE8;
+--md-sys-color-surface-container-high: #D0E8E0;
+--md-sys-color-surface-container-highest: #C6E2DA;
+--md-sys-color-inverse-surface: #1C302A;
+--md-sys-color-inverse-on-surface: #E4F5F0;
+--md-sys-color-inverse-primary: #7AD8BF;
+
+/* Fix bridge vars for light mode */
+--theme-bg: #EEF9F6;
+--theme-surface: #E4F5F0;
+--theme-surface-high: #D0E8E0;
+--theme-on-surface: #0A1E18;
+--theme-primary: #1A6650;
+--theme-primary-container: #A0EED8;
+--theme-on-primary: #FFFFFF;
+--theme-outline: #4A7868;
+--theme-outline-variant: #A0C8BC;
 }
 
 /* ============================================
@@ -428,75 +451,75 @@ tab-size: 4;
 }
 
 /* Python Syntax Colors */
-.syn-keyword { color: #9CD134;
+.syn-keyword { color: #7AD8BF;
 font-weight: 600;
 }
-.syn-builtin { color: #F4D13E;
+.syn-builtin { color: #FCF721;
 }
-.syn-string { color: #A0CFA0;
+.syn-string { color: #A0EED8;
 }
-.syn-comment { color: #506038;
+.syn-comment { color: #3A6858;
 font-style: italic;
 }
 .syn-number { color: #F78C6C;
 }
-.syn-operator { color: #89DDFF;
+.syn-operator { color: #67D8FF;
 }
-.syn-bracket { color: #F4D13E;
+.syn-bracket { color: #FCF721;
 }
-.syn-function { color: #BAE567;
+.syn-function { color: #A0EED8;
 }
-.syn-class-name{ color: #BAE567;
+.syn-class-name{ color: #A0EED8;
 font-weight: 600;
 }
-.syn-decorator { color: #6EA800;
+.syn-decorator { color: #FF8C69;
 }
-.syn-self { color: #F4D13E;
+.syn-self { color: #FF6B6B;
 font-style: italic;
 }
-.syn-bool { color: #9CD134;
+.syn-bool { color: #FF6B6B;
 font-weight: 600;
 }
-.syn-none { color: #9CD134;
+.syn-none { color: #FF6B6B;
 font-weight: 600;
 }
 .syn-default { color: var(--md-sys-color-on-surface);
 }
 
 /* Light theme syntax */
-.light-theme .syn-keyword { color: #4D7205;
+.light-theme .syn-keyword { color: #1A6650;
 font-weight: 600;
 }
-.light-theme .syn-builtin { color: #7A6500;
+.light-theme .syn-builtin { color: #2A6858;
 }
-.light-theme .syn-string { color: #2A6000;
+.light-theme .syn-string { color: #1A6650;
 }
 .light-theme .syn-comment { color: #7E7E7E;
 font-style: italic;
 }
 .light-theme .syn-number { color: #C44700;
 }
-.light-theme .syn-operator { color: #0070C1;
+.light-theme .syn-operator { color: #2A6858;
 }
 .light-theme .syn-bracket { color: #8B6914;
 }
-.light-theme .syn-function { color: #3A5800;
+.light-theme .syn-function { color: #1A5C54;
 }
-.light-theme .syn-class-name{ color: #1A4D00;
+.light-theme .syn-class-name{ color: #1A5C54;
 font-weight: 600;
 }
-.light-theme .syn-decorator { color: #7A6500;
+.light-theme .syn-decorator { color: #5C5800;
 }
-.light-theme .syn-self { color: #4A3800;
+.light-theme .syn-self { color: #1A4A3E;
 font-style: italic;
 }
-.light-theme .syn-bool { color: #4D7205;
+.light-theme .syn-bool { color: #1A6650;
 font-weight: 600;
 }
-.light-theme .syn-none { color: #4D7205;
+.light-theme .syn-none { color: #1A6650;
 font-weight: 600;
 }
-.light-theme .syn-default { color: #181D0A;
+.light-theme .syn-default { color: #0A1E18;
 }
 
 /* ============================================
@@ -544,7 +567,7 @@ border-bottom: 1px solid var(--md-sys-color-outline-variant);
 .ac-item:last-child { border-bottom: none;
 }
 .ac-item:hover, .ac-item.selected {
-background: rgba(156,209,52,0.15);
+background: rgba(122,216,191,0.15);
 color: var(--md-sys-color-primary);
 }
 .ac-badge {
@@ -556,17 +579,17 @@ font-weight: 600;
 letter-spacing: 0.3px;
 flex-shrink: 0;
 }
-.ac-badge.kw { background: rgba(156,209,52,0.2);
-color: #9CD134;
+.ac-badge.kw { background: rgba(122,216,191,0.2);
+color: #7AD8BF;
 }
-.ac-badge.fn { background: rgba(244,209,62,0.2);
-color: #F4D13E;
+.ac-badge.fn { background: rgba(255,212,38,0.2);
+color: #FCF721;
 }
-.ac-badge.bi { background: rgba(160,207,160,0.2);
-color: #A0CFA0;
+.ac-badge.bi { background: rgba(160,238,216,0.2);
+color: #A0EED8;
 }
-.ac-badge.sn { background: rgba(186,229,103,0.2);
-color: #BAE567;
+.ac-badge.sn { background: rgba(160,238,216,0.2);
+color: #A0EED8;
 }
 .ac-name { flex: 1;
 }
@@ -643,10 +666,10 @@ background: var(--md-sys-color-outline);
 transition: background var(--motion-duration-short), transform var(--motion-duration-short) var(--motion-spring);
 }
 .status-dot.running {
-background: #F4D13E;
+background: #FCF721;
 animation: pulse 0.7s ease-in-out infinite alternate;
 }
-.status-dot.success { background: #9CD134;
+.status-dot.success { background: #7AD8BF;
 }
 .status-dot.error { background: #F2B8B5;
 }
@@ -678,7 +701,7 @@ scrollbar-color: var(--md-sys-color-outline-variant) transparent;
 }
 #output .out-line.error { color: var(--md-sys-color-error);
 }
-#output .out-line.success { color: #9CD134;
+#output .out-line.success { color: #7AD8BF;
 }
 #output .out-line.info { color: var(--md-sys-color-on-surface-variant);
 font-style: italic;
@@ -812,7 +835,7 @@ overflow: hidden;
 }
 
 .run-fab:hover {
-box-shadow: 0 6px 20px rgba(156,209,52,0.4);
+box-shadow: 0 6px 20px rgba(122,216,191,0.40);
 transform: translateY(-2px);
 }
 .run-fab:active {
@@ -945,7 +968,7 @@ transition: background var(--motion-duration-short) var(--motion-standard);
 }
 .setting-row:last-child { border-bottom: none;
 }
-.setting-row:hover { background: rgba(156,209,52,0.05);
+.setting-row:hover { background: rgba(122,216,191,0.05);
 }
 
 .setting-info { flex: 1;
@@ -990,7 +1013,6 @@ line-height: 1.4;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* OFF state */
   left: 4px;
   width: 16px;
   height: 16px;
@@ -1001,22 +1023,29 @@ line-height: 1.4;
               background var(--motion-duration-medium) var(--motion-standard);
 }
 .m3-switch.on .m3-switch-thumb {
-  /* ON state */
   width: 24px;
   height: 24px;
   left: calc(52px - 24px - 4px - 4px);
   background: var(--md-sys-color-on-primary);
 }
-/* checkmark always in DOM, visibility controlled by opacity not display */
+/* ── CHECKMARK: pure CSS control, zero JS ── */
 .m3-switch-thumb .switch-check {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+  display: block;
   opacity: 0;
-  transition: opacity var(--motion-duration-short) var(--motion-standard) var(--motion-duration-short);
+  transform: scale(0.4);
+  transition: opacity 150ms ease 160ms, transform 150ms var(--motion-spring) 160ms;
+  pointer-events: none;
+  color: var(--md-sys-color-on-primary);
+}
+.m3-switch-thumb .switch-check path {
+  fill: currentColor;
 }
 .m3-switch.on .m3-switch-thumb .switch-check {
   opacity: 1;
+  transform: scale(1);
 }
 
 /* Font size select */
@@ -1053,7 +1082,7 @@ transition: all var(--motion-duration-short) var(--motion-spring);
 }
 .theme-pill.active {
 border-color: var(--md-sys-color-primary);
-background: rgba(156,209,52,0.1);
+background: rgba(122,216,191,0.10);
 color: var(--md-sys-color-primary);
 }
 
@@ -1214,286 +1243,29 @@ font-size: 28px;
 bottom: calc(80px + env(safe-area-inset-bottom));
 }
 }
-
-
-/* === VIBRANCY BOOST === */
-:root {
-  --vibe-glow-primary: 0 0 12px rgba(156, 209, 52, 0.45);
-  --vibe-glow-secondary: 0 0 12px rgba(244, 209, 62, 0.45);
-  --gradient-vibe: linear-gradient(135deg, #9CD134, #F4D13E);
-}
-
-/* FAB glow */
-.run-fab {
-  box-shadow: var(--elev-2), var(--vibe-glow-primary);
-}
-.run-fab:hover {
-  box-shadow: var(--elev-3), 0 0 18px rgba(156, 209, 52, 0.65);
-}
-
-/* Brand icon */
-.brand-icon {
-  background: var(--gradient-vibe);
-  box-shadow: var(--elev-2), var(--vibe-glow-primary);
-}
-
-/* Hover boost */
-.icon-btn:hover::before {
-  opacity: 0.14;
-}
-
-/* Autocomplete */
-.ac-item:hover, .ac-item.selected {
-  background: rgba(156,209,52,0.25);
-}
-
-/* === SWITCH FIX === */
-.m3-switch {
-  width: 52px;
-  height: 32px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  border: 2px solid rgba(255,255,255,0.2);
-  cursor: pointer;
-  position: relative;
-  transition: all 250ms ease;
-  overflow: hidden;
-}
-
-.m3-switch.on {
-  background: var(--md-sys-color-primary);
-  border-color: var(--md-sys-color-primary);
-  box-shadow: var(--vibe-glow-primary);
-}
-
-.m3-switch-thumb {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  border-radius: 50%;
-  left: 4px;
-  width: 18px;
-  height: 18px;
-  background: #cfd8b5;
-  transition: all 250ms cubic-bezier(.2,.8,.2,1);
-}
-
-.m3-switch.on .m3-switch-thumb {
-  width: 24px;
-  height: 24px;
-  left: calc(52px - 24px - 4px);
-  background: #0f1c00;
-}
-
-.m3-switch-thumb .switch-check {
-  width: 14px;
-  height: 14px;
-  opacity: 0;
-  fill: #9CD134;
-  transition: opacity 200ms ease;
-}
-
-.m3-switch.on .switch-check {
-  opacity: 1;
-}
-
-.m3-switch:active {
-  transform: scale(0.95);
-}
-
-/* Ripple effect */
-.m3-switch::after {
-  content: "";
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  transform: scale(0);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.m3-switch:active::after {
-  transform: scale(1);
-  opacity: 1;
-  transition: transform 400ms, opacity 600ms;
-}
-
-
-/* === EXPRESSIVE MODE (NOT JUST VIBRANT) === */
-
-/* Softer, more playful gradients */
-:root {
-  --gradient-expressive: linear-gradient(120deg, #9CD134, #F4D13E, #BAE567);
-}
-
-/* Reduce harsh glow, make it smoother */
-.run-fab {
-  box-shadow: var(--elev-2), 0 4px 16px rgba(156,209,52,0.25);
-}
-.run-fab:hover {
-  box-shadow: var(--elev-3), 0 6px 20px rgba(156,209,52,0.35);
-}
-
-/* Expressive brand */
-.brand-icon {
-  background: var(--gradient-expressive);
-}
-
-/* === FIX LIGHT MODE LOOKING WEIRD === */
-.light-theme {
-  --md-sys-color-background: #F5FAEC;
-  --md-sys-color-surface: #F5FAEC;
-  --md-sys-color-surface-container: #ECF3DD;
-  --md-sys-color-on-surface: #1A1C13;
-  --md-sys-color-outline: #6B705C;
-}
-
-/* Fix washed-out text */
-.light-theme body {
-  color: #1A1C13;
-}
-
-/* Cards look cleaner */
-.light-theme .card {
-  background: #ECF3DD;
-  border: 1px solid rgba(0,0,0,0.06);
-}
-
-/* Buttons less ugly */
-.light-theme .icon-btn:hover::before {
-  opacity: 0.08;
-}
-
-/* === SWITCHES (CONSISTENT BOTH THEMES) === */
-.m3-switch {
-  background: rgba(120,120,120,0.2);
-  border: 2px solid rgba(120,120,120,0.3);
-}
-
-.light-theme .m3-switch {
-  background: rgba(0,0,0,0.08);
-  border: 2px solid rgba(0,0,0,0.2);
-}
-
-.m3-switch.on {
-  background: var(--md-sys-color-primary);
-  border-color: var(--md-sys-color-primary);
-}
-
-.m3-switch-thumb {
-  background: #E6EFC2;
-}
-
-.light-theme .m3-switch-thumb {
-  background: #dce6b0;
-}
-
-.m3-switch.on .m3-switch-thumb {
-  background: #0f1c00;
-}
-
-/* === RIPPLE IMPROVEMENT (LESS AGGRESSIVE) === */
-.m3-switch::after {
-  background: rgba(255,255,255,0.15);
-}
-.light-theme .m3-switch::after {
-  background: rgba(0,0,0,0.08);
-}
-
-
-/* === NEW TEAL-INSPIRED SWITCH (LIKE IMAGE) === */
-
-/* Dark theme switch (teal pill + dark thumb) */
-.m3-switch {
-  width: 52px;
-  height: 32px;
-  border-radius: 999px;
-  background: #6FBFAE; /* teal track */
-  border: none;
-}
-
-.m3-switch-thumb {
-  width: 24px;
-  height: 24px;
-  left: calc(52px - 24px - 4px);
-  background: #003B2E; /* dark inner circle */
-}
-
-/* Checkmark visible */
-.m3-switch-thumb .switch-check {
-  opacity: 1;
-  fill: #9EF3D7;
-}
-
-/* OFF state */
-.m3-switch:not(.on) {
-  background: rgba(255,255,255,0.12);
-}
-
-.m3-switch:not(.on) .m3-switch-thumb {
-  left: 4px;
-  width: 18px;
-  height: 18px;
-  background: #cfd8b5;
-}
-
-/* === LIGHT MODE VERSION === */
-.light-theme .m3-switch {
-  background: #BFE9DC; /* lighter teal */
-}
-
-.light-theme .m3-switch-thumb {
-  background: #0A3D30;
-}
-
-.light-theme .m3-switch:not(.on) {
-  background: rgba(0,0,0,0.1);
-}
-
-.light-theme .m3-switch:not(.on) .m3-switch-thumb {
-  background: #dce6b0;
-}
-
-/* === ADAPT OTHER COLORS TO MATCH TEAL FEEL === */
-:root {
-  --accent-teal: #6FBFAE;
-  --accent-teal-dark: #003B2E;
-  --accent-teal-light: #BFE9DC;
-}
-
-/* Buttons subtle alignment */
-.run-fab {
-  background: linear-gradient(135deg, #9CD134, #6FBFAE);
-}
-
-/* Selection highlight */
-::selection {
-  background: #6FBFAE;
-  color: #003B2E;
-}
 </style>
 </head>
 <body>
+
 <div class="app-shell" id="app">
+
 <!-- TOP BAR -->
 <header class="top-bar">
 <div class="brand">
 <div class="brand-icon">
-<svg height="24" viewbox="0 0 110 110" width="24" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<lineargradient id="pyBlue" x1="0%" x2="100%" y1="0%" y2="100%">
-<stop offset="0%" style="stop-color:#387EB8"></stop>
-<stop offset="100%" style="stop-color:#366994"></stop>
-</lineargradient>
-<lineargradient id="pyYellow" x1="0%" x2="100%" y1="0%" y2="100%">
-<stop offset="0%" style="stop-color:#FFE052"></stop>
-<stop offset="100%" style="stop-color:#FFC331"></stop>
-</lineargradient>
-</defs>
-<path d="M54.9,4.6c-27.3,0-25.6,11.9-25.6,11.9l0,12.3h26v3.7H20.9c0,0-17.4-2-17.4,25.6s15.2,24.9,15.2,24.9h9.1V70.7c0,0-0.5-15.2,14.9-15.2h25.7c0,0,14.4,0.2,14.4-13.9V18.3C82.8,18.3,84.9,4.6,54.9,4.6z M40.5,12.2c2.6,0,4.7,2.1,4.7,4.7s-2.1,4.7-4.7,4.7s-4.7-2.1-4.7-4.7S37.9,12.2,40.5,12.2z" fill="url(#pyBlue)"></path>
-<path d="M55.5,105.4c27.3,0,25.6-11.9,25.6-11.9l0-12.3h-26v-3.7h34.4c0,0,17.4,2,17.4-25.6S91.7,27,91.7,27h-9.1v12.3c0,0,0.5,15.2-14.9,15.2H42c0,0-14.4-0.2-14.4,13.9v23.3C27.6,91.7,25.5,105.4,55.5,105.4z M69.9,97.8c-2.6,0-4.7-2.1-4.7-4.7s2.1-4.7,4.7-4.7s4.7,2.1,4.7,4.7S72.5,97.8,69.9,97.8z" fill="url(#pyYellow)"></path>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="24" height="24">
+  <defs>
+    <linearGradient id="pyBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#387EB8"/>
+      <stop offset="100%" style="stop-color:#366994"/>
+    </linearGradient>
+    <linearGradient id="pyYellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE052"/>
+      <stop offset="100%" style="stop-color:#FFC331"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#pyBlue)" d="M54.9,4.6c-27.3,0-25.6,11.9-25.6,11.9l0,12.3h26v3.7H20.9c0,0-17.4-2-17.4,25.6s15.2,24.9,15.2,24.9h9.1V70.7c0,0-0.5-15.2,14.9-15.2h25.7c0,0,14.4,0.2,14.4-13.9V18.3C82.8,18.3,84.9,4.6,54.9,4.6z M40.5,12.2c2.6,0,4.7,2.1,4.7,4.7s-2.1,4.7-4.7,4.7s-4.7-2.1-4.7-4.7S37.9,12.2,40.5,12.2z"/>
+  <path fill="url(#pyYellow)" d="M55.5,105.4c27.3,0,25.6-11.9,25.6-11.9l0-12.3h-26v-3.7h34.4c0,0,17.4,2,17.4-25.6S91.7,27,91.7,27h-9.1v12.3c0,0,0.5,15.2-14.9,15.2H42c0,0-14.4-0.2-14.4,13.9v23.3C27.6,91.7,25.5,105.4,55.5,105.4z M69.9,97.8c-2.6,0-4.7-2.1-4.7-4.7s2.1-4.7,4.7-4.7s4.7,2.1,4.7,4.7S72.5,97.8,69.9,97.8z"/>
 </svg>
 </div>
 <div class="brand-text">
@@ -1502,20 +1274,21 @@ bottom: calc(80px + env(safe-area-inset-bottom));
 </div>
 </div>
 <div class="top-actions">
-<button aria-label="Toggle theme" class="icon-btn" id="theme-toggle-btn" style="display:flex;align-items:center;justify-content:center;" title="Toggle theme">
+<button class="icon-btn" id="theme-toggle-btn" title="Toggle theme" aria-label="Toggle theme" style="display:flex;align-items:center;justify-content:center;">
 <!-- dark mode = show sun; light mode = show moon -->
-<svg fill="#BACAAA" height="22" id="icon-sun" style="display:block;flex-shrink:0;" viewbox="0 -960 960 960" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M565-395q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm-226.5 56.5Q280-397 280-480t58.5-141.5Q397-680 480-680t141.5 58.5Q680-563 680-480t-58.5 141.5Q563-280 480-280t-141.5-58.5ZM80-440q-17 0-28.5-11.5T40-480q0-17 11.5-28.5T80-520h80q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440H80Zm720 0q-17 0-28.5-11.5T760-480q0-17 11.5-28.5T800-520h80q17 0 28.5 11.5T920-480q0 17-11.5 28.5T880-440h-80ZM451.5-771.5Q440-783 440-800v-80q0-17 11.5-28.5T480-920q17 0 28.5 11.5T520-880v80q0 17-11.5 28.5T480-760q-17 0-28.5-11.5Zm0 720Q440-63 440-80v-80q0-17 11.5-28.5T480-200q17 0 28.5 11.5T520-160v80q0 17-11.5 28.5T480-40q-17 0-28.5-11.5ZM226-678l-43-42q-12-11-11.5-28t11.5-29q12-12 29-12t28 12l42 43q11 12 11 28t-11 28q-11 12-27.5 11.5T226-678Zm494 495-42-43q-11-12-11-28.5t11-27.5q11-12 27.5-11.5T734-282l43 42q12 11 11.5 28T777-183q-12 12-29 12t-28-12Zm-42-495q-12-11-11.5-27.5T678-734l42-43q11-12 28-11.5t29 11.5q12 12 12 29t-12 28l-43 42q-12 11-28 11t-28-11ZM183-183q-12-12-12-29t12-28l43-42q12-11 28.5-11t27.5 11q12 11 11.5 27.5T282-226l-42 43q-11 12-28 11.5T183-183Zm297-297Z"></path></svg>
-<svg fill="#3A4728" height="22" id="icon-moon" style="display:none;flex-shrink:0;" viewbox="0 -960 960 960" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M480-120q-151 0-255.5-104.5T120-480q0-138 90-239.5T440-838q13-2 23 3.5t16 14.5q6 9 6.5 21t-7.5 23q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q11-7 22.5-6.5T819-479q10 5 15.5 15t3.5 24q-14 138-117.5 229T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z"></path></svg>
+<svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" style="display:block;flex-shrink:0;" fill="#A0C0B4"><path d="M565-395q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm-226.5 56.5Q280-397 280-480t58.5-141.5Q397-680 480-680t141.5 58.5Q680-563 680-480t-58.5 141.5Q563-280 480-280t-141.5-58.5ZM80-440q-17 0-28.5-11.5T40-480q0-17 11.5-28.5T80-520h80q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440H80Zm720 0q-17 0-28.5-11.5T760-480q0-17 11.5-28.5T800-520h80q17 0 28.5 11.5T920-480q0 17-11.5 28.5T880-440h-80ZM451.5-771.5Q440-783 440-800v-80q0-17 11.5-28.5T480-920q17 0 28.5 11.5T520-880v80q0 17-11.5 28.5T480-760q-17 0-28.5-11.5Zm0 720Q440-63 440-80v-80q0-17 11.5-28.5T480-200q17 0 28.5 11.5T520-160v80q0 17-11.5 28.5T480-40q-17 0-28.5-11.5ZM226-678l-43-42q-12-11-11.5-28t11.5-29q12-12 29-12t28 12l42 43q11 12 11 28t-11 28q-11 12-27.5 11.5T226-678Zm494 495-42-43q-11-12-11-28.5t11-27.5q11-12 27.5-11.5T734-282l43 42q12 11 11.5 28T777-183q-12 12-29 12t-28-12Zm-42-495q-12-11-11.5-27.5T678-734l42-43q11-12 28-11.5t29 11.5q12 12 12 29t-12 28l-43 42q-12 11-28 11t-28-11ZM183-183q-12-12-12-29t12-28l43-42q12-11 28.5-11t27.5 11q12 11 11.5 27.5T282-226l-42 43q-11 12-28 11.5T183-183Zm297-297Z" /></svg>
+<svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" style="display:none;flex-shrink:0;" fill="#2A4A40"><path d="M480-120q-151 0-255.5-104.5T120-480q0-138 90-239.5T440-838q13-2 23 3.5t16 14.5q6 9 6.5 21t-7.5 23q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q11-7 22.5-6.5T819-479q10 5 15.5 15t3.5 24q-14 138-117.5 229T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z" /></svg>
 </button>
-<button aria-label="Clear code" class="icon-btn" id="clear-code-btn" title="Clear code"><svg fill="#BACAAA" height="22" viewbox="0 -960 960 960" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z"></path></svg></button>
+<button class="icon-btn" id="clear-code-btn" title="Clear code" aria-label="Clear code"><svg xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="#A0C0B4"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z" /></svg></button>
 </div>
 </header>
+
 <!-- EDITOR PANEL -->
 <div class="panel active" id="panel-editor">
 <div class="editor-section" id="editor-section">
 <div class="editor-header">
 <div class="file-chip">
-<span class="chip-icon"><svg fill="currentColor" height="16px" viewbox="0 -960 960 960" width="16px" xmlns="http://www.w3.org/2000/svg"><path d="M360-440h240q17 0 28.5-11.5T640-480q0-17-11.5-28.5T600-520H360q-17 0-28.5 11.5T320-480q0 17 11.5 28.5T360-440Zm0 120h240q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400H360q-17 0-28.5 11.5T320-360q0 17 11.5 28.5T360-320Zm0 120h120q17 0 28.5-11.5T520-240q0-17-11.5-28.5T480-280H360q-17 0-28.5 11.5T320-240q0 17 11.5 28.5T360-200ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm480-520H580q-25 0-42.5-17.5T520-660v-140H240v640h480v-440ZM240-800v200-200 640-640Z"></path></svg></span>
+<span class="chip-icon"><svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor"><path d="M360-440h240q17 0 28.5-11.5T640-480q0-17-11.5-28.5T600-520H360q-17 0-28.5 11.5T320-480q0 17 11.5 28.5T360-440Zm0 120h240q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400H360q-17 0-28.5 11.5T320-360q0 17 11.5 28.5T360-320Zm0 120h120q17 0 28.5-11.5T520-240q0-17-11.5-28.5T480-280H360q-17 0-28.5 11.5T320-240q0 17 11.5 28.5T360-200ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm480-520H580q-25 0-42.5-17.5T520-660v-140H240v640h480v-440ZM240-800v200-200 640-640Z" /></svg></span>
 <span id="filename-display">main.py</span>
 </div>
 <div class="kbd-hint">
@@ -1529,28 +1302,38 @@ bottom: calc(80px + env(safe-area-inset-bottom));
 1
 </div>
 <div class="editor-input-wrapper">
-<div aria-hidden="true" class="highlight-layer" id="highlight-layer"></div>
-<textarea autocapitalize="off" autocomplete="off" autocorrect="off" id="code-input" placeholder="# yo bro just start typing 🐍
-# Ctrl+Enter to run  |  Tab for autocomplete 💜" spellcheck="false" wrap="off"></textarea>
+<div class="highlight-layer" id="highlight-layer" aria-hidden="true"></div>
+<textarea
+id="code-input"
+spellcheck="false"
+autocorrect="off"
+autocapitalize="off"
+autocomplete="off"
+placeholder="# yo bro just start typing 🐍&#10;# Ctrl+Enter to run  |  Tab for autocomplete 💜"
+wrap="off"
+></textarea>
 </div>
 </div>
 </div>
 </div>
 </div>
+
 <!-- RESIZE HANDLE -->
 <div class="resize-handle" id="resize-handle"></div>
+
 <!-- OUTPUT PANEL -->
 <div class="output-section" id="output-section">
 <div class="output-header">
 <div class="status-dot" id="status-dot"></div>
 <span class="output-label">Output</span>
-<button class="icon-btn" id="clear-output-btn" style="width:32px;height:32px;" title="Clear output"><svg fill="#BACAAA" height="18" viewbox="0 -960 960 960" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z"></path></svg></button>
+<button class="icon-btn" id="clear-output-btn" style="width:32px;height:32px;" title="Clear output"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="#A0C0B4"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z" /></svg></button>
 </div>
 <div id="output">
 <span class="out-line info">Ready!  Write Python and press ▶ to run…</span>
 </div>
 </div>
 </div>
+
 <!-- EXPORT PANEL -->
 <div class="panel" id="panel-export">
 <div class="settings-panel">
@@ -1561,7 +1344,7 @@ Export Code
 <div class="setting-row">
 <div class="setting-info">
 <div class="setting-label">
-<svg fill="currentColor" height="16" style="vertical-align:middle;margin-right:6px;" viewbox="0 -960 960 960" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M480-480ZM320-183l-90 90q-12 12-28 11.5T174-94q-11-12-11.5-28t11.5-28l90-90h-50q-17 0-28.5-11.5T174-280q0-17 11.5-28.5T214-320h146q17 0 28.5 11.5T400-280v146q0 17-11.5 28.5T360-94q-17 0-28.5-11.5T320-134v-49ZM171.5-411.5Q160-423 160-440v-360q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H520q-17 0-28.5-11.5T480-120q0-17 11.5-28.5T520-160h200v-440H560q-17 0-28.5-11.5T520-640v-160H240v360q0 17-11.5 28.5T200-400q-17 0-28.5-11.5Z"></path></svg>Export as .py file
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M480-480ZM320-183l-90 90q-12 12-28 11.5T174-94q-11-12-11.5-28t11.5-28l90-90h-50q-17 0-28.5-11.5T174-280q0-17 11.5-28.5T214-320h146q17 0 28.5 11.5T400-280v146q0 17-11.5 28.5T360-94q-17 0-28.5-11.5T320-134v-49ZM171.5-411.5Q160-423 160-440v-360q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H520q-17 0-28.5-11.5T480-120q0-17 11.5-28.5T520-160h200v-440H560q-17 0-28.5-11.5T520-640v-160H240v360q0 17-11.5 28.5T200-400q-17 0-28.5-11.5Z" /></svg>Export as .py file
 </div>
 <div class="setting-sub">
 Download your Python source code
@@ -1569,14 +1352,14 @@ Download your Python source code
 </div>
 </div>
 <div style="padding: 8px 16px 16px;">
-<button class="export-btn primary-btn" id="export-py-btn"><svg fill="currentColor" height="18" style="flex-shrink:0;" viewbox="0 -960 960 960" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M465-339.5q-7-2.5-13-8.5L308-492q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T365-549l75 75v-286q0-17 11.5-28.5T480-800q17 0 28.5 11.5T520-760v286l75-75q12-12 28.5-11.5T652-548q11 12 11.5 28T652-492L508-348q-6 6-13 8.5t-15 2.5q-8 0-15-2.5ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z"></path></svg> Download .py</button>
+<button class="export-btn primary-btn" id="export-py-btn"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor" style="flex-shrink:0;"><path d="M465-339.5q-7-2.5-13-8.5L308-492q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T365-549l75 75v-286q0-17 11.5-28.5T480-800q17 0 28.5 11.5T520-760v286l75-75q12-12 28.5-11.5T652-548q11 12 11.5 28T652-492L508-348q-6 6-13 8.5t-15 2.5q-8 0-15-2.5ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z" /></svg> Download .py</button>
 </div>
 </div>
 <div class="settings-card">
 <div class="setting-row">
 <div class="setting-info">
 <div class="setting-label">
-<svg fill="currentColor" height="16" style="vertical-align:middle;margin-right:6px;" viewbox="0 -960 960 960" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z"></path></svg>Copy to clipboard
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z" /></svg>Copy to clipboard
 </div>
 <div class="setting-sub">
 Copy all code to clipboard
@@ -1584,14 +1367,14 @@ Copy all code to clipboard
 </div>
 </div>
 <div style="padding: 8px 16px 16px;">
-<button class="export-btn" id="copy-btn"><svg fill="currentColor" height="18" style="flex-shrink:0;" viewbox="0 -960 960 960" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z"></path></svg> Copy Code</button>
+<button class="export-btn" id="copy-btn"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 -960 960 960" fill="currentColor" style="flex-shrink:0;"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z" /></svg> Copy Code</button>
 </div>
 </div>
 <div class="settings-card">
 <div class="setting-row">
 <div class="setting-info">
 <div class="setting-label">
-<svg fill="currentColor" height="16" style="vertical-align:middle;margin-right:6px;" viewbox="0 -960 960 960" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M253-173q-93-93-93-227 0-113 67-217t184-182q22-15 45.5-1.5T480-760v52q0 34 23.5 57t57.5 23q17 0 32.5-7.5T621-657q8-10 20.5-12.5T665-664q63 45 99 115t36 149q0 134-93 227T480-80q-134 0-227-93Zm-13-227q0 52 21 98.5t60 81.5q-1-5-1-9v-9q0-32 12-60t35-51l113-111 113 111q23 23 35 51t12 60v9q0 4-1 9 39-35 60-81.5t21-98.5q0-50-18.5-94.5T648-574q-20 13-42 19.5t-45 6.5q-62 0-107.5-41T401-690q-78 66-119.5 140.5T240-400Zm240 52-57 56q-11 11-17 25t-6 29q0 32 23.5 55t56.5 23q33 0 56.5-23t23.5-55q0-16-6-29.5T537-292l-57-56Z"></path></svg>Clear editor
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M253-173q-93-93-93-227 0-113 67-217t184-182q22-15 45.5-1.5T480-760v52q0 34 23.5 57t57.5 23q17 0 32.5-7.5T621-657q8-10 20.5-12.5T665-664q63 45 99 115t36 149q0 134-93 227T480-80q-134 0-227-93Zm-13-227q0 52 21 98.5t60 81.5q-1-5-1-9v-9q0-32 12-60t35-51l113-111 113 111q23 23 35 51t12 60v9q0 4-1 9 39-35 60-81.5t21-98.5q0-50-18.5-94.5T648-574q-20 13-42 19.5t-45 6.5q-62 0-107.5-41T401-690q-78 66-119.5 140.5T240-400Zm240 52-57 56q-11 11-17 25t-6 29q0 32 23.5 55t56.5 23q33 0 56.5-23t23.5-55q0-16-6-29.5T537-292l-57-56Z" /></svg>Clear editor
 </div>
 <div class="setting-sub">
 Remove all code from editor
@@ -1599,9 +1382,10 @@ Remove all code from editor
 </div>
 </div>
 <div style="padding: 8px 16px 16px;">
-<button class="clear-btn" id="clear-all-btn"><svg fill="currentColor" height="20" style="flex-shrink:0;" viewbox="0 -960 960 960" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z"></path></svg> Clear Everything</button>
+<button class="clear-btn" id="clear-all-btn"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="currentColor" style="flex-shrink:0;"><path d="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z" /></svg> Clear Everything</button>
 </div>
 </div>
+
 <div class="settings-section-title">
 Snippets
 </div>
@@ -1610,6 +1394,7 @@ Snippets
 </div>
 </div>
 </div>
+
 <!-- SETTINGS PANEL -->
 <div class="panel" id="panel-settings">
 <div class="settings-panel">
@@ -1636,6 +1421,7 @@ Light
 </div>
 </div>
 </div>
+
 <div class="settings-card">
 <div class="setting-row">
 <div class="setting-info">
@@ -1649,7 +1435,7 @@ Editor and output font size
 <select class="m3-select" id="font-size-select">
 <option value="11">11px</option>
 <option value="12">12px</option>
-<option selected="" value="13">13px (default)</option>
+<option value="13" selected>13px (default)</option>
 <option value="14">14px</option>
 <option value="15">15px</option>
 <option value="16">16px</option>
@@ -1664,8 +1450,8 @@ Line Numbers
 Show line numbers in editor
 </div>
 </div>
-<button aria-checked="true" class="m3-switch on" id="toggle-line-numbers" role="switch">
-<div class="m3-switch-thumb"><svg class="switch-check" fill="#141E01" height="14" viewbox="0 -960 960 960" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"></path></svg></div>
+<button class="m3-switch on" id="toggle-line-numbers" role="switch" aria-checked="true">
+<div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
 </button>
 </div>
 <div class="setting-row">
@@ -1677,8 +1463,8 @@ Autocomplete
 Show suggestions while typing
 </div>
 </div>
-<button aria-checked="true" class="m3-switch on" id="toggle-autocomplete" role="switch">
-<div class="m3-switch-thumb"><svg class="switch-check" fill="#141E01" height="14" viewbox="0 -960 960 960" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"></path></svg></div>
+<button class="m3-switch on" id="toggle-autocomplete" role="switch" aria-checked="true">
+<div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
 </button>
 </div>
 <div class="setting-row">
@@ -1690,11 +1476,12 @@ Auto-indent
 Smart indentation on Enter
 </div>
 </div>
-<button aria-checked="true" class="m3-switch on" id="toggle-indent" role="switch">
-<div class="m3-switch-thumb"><svg class="switch-check" fill="#141E01" height="14" viewbox="0 -960 960 960" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"></path></svg></div>
+<button class="m3-switch on" id="toggle-indent" role="switch" aria-checked="true">
+<div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
 </button>
 </div>
 </div>
+
 <div class="settings-section-title">
 About
 </div>
@@ -1705,51 +1492,58 @@ About
 PyPad v1.1
 </div>
 <div class="setting-sub">
-Built with  💜 by Bhuwan. Thanks to claude for a big help in this app <br/>
+Built with  💜 by Bhuwan. Thanks to claude.<br>
 This project stands with  Palestine 🇵🇸
 </div>
 </div>
-<span style="display:flex;align-items:center;"><svg height="28" viewbox="0 0 110 110" width="28" xmlns="http://www.w3.org/2000/svg"><defs><lineargradient id="pyBlue2" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#387EB8"></stop><stop offset="100%" style="stop-color:#366994"></stop></lineargradient><lineargradient id="pyYellow2" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#FFE052"></stop><stop offset="100%" style="stop-color:#FFC331"></stop></lineargradient></defs><path d="M54.9,4.6c-27.3,0-25.6,11.9-25.6,11.9l0,12.3h26v3.7H20.9c0,0-17.4-2-17.4,25.6s15.2,24.9,15.2,24.9h9.1V70.7c0,0-0.5-15.2,14.9-15.2h25.7c0,0,14.4,0.2,14.4-13.9V18.3C82.8,18.3,84.9,4.6,54.9,4.6z M40.5,12.2c2.6,0,4.7,2.1,4.7,4.7s-2.1,4.7-4.7,4.7s-4.7-2.1-4.7-4.7S37.9,12.2,40.5,12.2z" fill="url(#pyBlue2)"></path><path d="M55.5,105.4c27.3,0,25.6-11.9,25.6-11.9l0-12.3h-26v-3.7h34.4c0,0,17.4,2,17.4-25.6S91.7,27,91.7,27h-9.1v12.3c0,0,0.5,15.2-14.9,15.2H42c0,0-14.4-0.2-14.4,13.9v23.3C27.6,91.7,25.5,105.4,55.5,105.4z M69.9,97.8c-2.6,0-4.7-2.1-4.7-4.7s2.1-4.7,4.7-4.7s4.7,2.1,4.7,4.7S72.5,97.8,69.9,97.8z" fill="url(#pyYellow2)"></path></svg></span>
+<span style="display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="28" height="28"><defs><linearGradient id="pyBlue2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#387EB8"/><stop offset="100%" style="stop-color:#366994"/></linearGradient><linearGradient id="pyYellow2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FFE052"/><stop offset="100%" style="stop-color:#FFC331"/></linearGradient></defs><path fill="url(#pyBlue2)" d="M54.9,4.6c-27.3,0-25.6,11.9-25.6,11.9l0,12.3h26v3.7H20.9c0,0-17.4-2-17.4,25.6s15.2,24.9,15.2,24.9h9.1V70.7c0,0-0.5-15.2,14.9-15.2h25.7c0,0,14.4,0.2,14.4-13.9V18.3C82.8,18.3,84.9,4.6,54.9,4.6z M40.5,12.2c2.6,0,4.7,2.1,4.7,4.7s-2.1,4.7-4.7,4.7s-4.7-2.1-4.7-4.7S37.9,12.2,40.5,12.2z"/><path fill="url(#pyYellow2)" d="M55.5,105.4c27.3,0,25.6-11.9,25.6-11.9l0-12.3h-26v-3.7h34.4c0,0,17.4,2,17.4-25.6S91.7,27,91.7,27h-9.1v12.3c0,0,0.5,15.2-14.9,15.2H42c0,0-14.4-0.2-14.4,13.9v23.3C27.6,91.7,25.5,105.4,55.5,105.4z M69.9,97.8c-2.6,0-4.7-2.1-4.7-4.7s2.1-4.7,4.7-4.7s4.7,2.1,4.7,4.7S72.5,97.8,69.9,97.8z"/></svg></span>
 </div>
 </div>
 </div>
 </div>
+
 <!-- CONSOLE MINI FAB -->
-<button aria-label="Show output" class="console-fab" id="console-fab" title="Show output">
-<svg fill="currentColor" height="20" viewbox="0 -960 960 960" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H160v400Zm0 0v-400 400Zm80-120q-17 0-28.5-11.5T200-400q0-17 11.5-28.5T240-440h160q17 0 28.5 11.5T440-400q0 17-11.5 28.5T400-360H240Zm0-120q-17 0-28.5-11.5T200-520q0-17 11.5-28.5T240-560h480q17 0 28.5 11.5T760-520q0 17-11.5 28.5T720-480H240Z"></path></svg>
+<button class="console-fab" id="console-fab" title="Show output" aria-label="Show output">
+<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H160v400Zm0 0v-400 400Zm80-120q-17 0-28.5-11.5T200-400q0-17 11.5-28.5T240-440h160q17 0 28.5 11.5T440-400q0 17-11.5 28.5T400-360H240Zm0-120q-17 0-28.5-11.5T200-520q0-17 11.5-28.5T240-560h480q17 0 28.5 11.5T760-520q0 17-11.5 28.5T720-480H240Z" /></svg>
 <div class="output-badge"></div>
 </button>
+
 <!-- RUN FAB -->
-<button aria-label="Run code" class="run-fab" id="run-fab" title="Run code (Ctrl+Enter)">
-<svg fill="currentColor" height="24" viewbox="0 -960 960 960" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M360-272q-17 0-28.5-11.5T320-312v-336q0-17 11.5-28.5T360-688q6 0 11 1.5t10 4.5l336 168q14 7 14 22.5T717-469L381-301q-5 3-10 4.5t-11 1.5Z"></path></svg>
+<button class="run-fab" id="run-fab" title="Run code (Ctrl+Enter)" aria-label="Run code">
+<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 -960 960 960" fill="currentColor"><path d="M360-272q-17 0-28.5-11.5T320-312v-336q0-17 11.5-28.5T360-688q6 0 11 1.5t10 4.5l336 168q14 7 14 22.5T717-469L381-301q-5 3-10 4.5t-11 1.5Z" /></svg>
 </button>
+
 <!-- AUTOCOMPLETE -->
 <div id="autocomplete-box"></div>
+
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav" id="bottom-nav">
 <button class="nav-item active" data-panel="editor">
 <div class="nav-indicator"></div>
-<span class="nav-icon"><svg fill="#BACAAA" height="22" id="icon-editor-nav" viewbox="0 -960 960 960" width="22" xmlns="http://www.w3.org/2000/svg"><path d="m153-480 115 115q11 12 11.5 28.5T268-308q-12 12-28 12t-28-12L68-452q-12-12-12-28t12-28l144-144q12-12 28-12t28 12q12 12 12 28.5T268-595L153-480Zm203.5 300.5Q349-194 354-210l176-564q5-16 19.5-23.5T580-800q16 5 23.5 19.5T606-750L430-186q-5 16-19.5 23.5T380-160q-16-5-23.5-19.5ZM807-480 692-595q-12-12-12-28.5t12-28.5q12-12 28-12t28 12l144 144q12 12 12 28t-12 28L748-308q-12 12-28 12t-28-12q-12-12-12-28.5t12-28.5l115-115Z"></path></svg></span>
+<span class="nav-icon"><svg id="icon-editor-nav" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="#A0C0B4"><path d="m153-480 115 115q11 12 11.5 28.5T268-308q-12 12-28 12t-28-12L68-452q-12-12-12-28t12-28l144-144q12-12 28-12t28 12q12 12 12 28.5T268-595L153-480Zm203.5 300.5Q349-194 354-210l176-564q5-16 19.5-23.5T580-800q16 5 23.5 19.5T606-750L430-186q-5 16-19.5 23.5T380-160q-16-5-23.5-19.5ZM807-480 692-595q-12-12-12-28.5t12-28.5q12-12 28-12t28 12l144 144q12 12 12 28t-12 28L748-308q-12 12-28 12t-28-12q-12-12-12-28.5t12-28.5l115-115Z" /></svg></span>
 <span class="nav-label">Editor</span>
 </button>
 <button class="nav-item" data-panel="export">
 <div class="nav-indicator"></div>
-<span class="nav-icon"><svg fill="#BACAAA" height="22" id="icon-export-nav" viewbox="0 -960 960 960" width="22" xmlns="http://www.w3.org/2000/svg"><path d="M480-480ZM320-183l-90 90q-12 12-28 11.5T174-94q-11-12-11.5-28t11.5-28l90-90h-50q-17 0-28.5-11.5T174-280q0-17 11.5-28.5T214-320h146q17 0 28.5 11.5T400-280v146q0 17-11.5 28.5T360-94q-17 0-28.5-11.5T320-134v-49ZM171.5-411.5Q160-423 160-440v-360q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H520q-17 0-28.5-11.5T480-120q0-17 11.5-28.5T520-160h200v-440H560q-17 0-28.5-11.5T520-640v-160H240v360q0 17-11.5 28.5T200-400q-17 0-28.5-11.5Z"></path></svg></span>
+<span class="nav-icon"><svg id="icon-export-nav" xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="#A0C0B4"><path d="M480-480ZM320-183l-90 90q-12 12-28 11.5T174-94q-11-12-11.5-28t11.5-28l90-90h-50q-17 0-28.5-11.5T174-280q0-17 11.5-28.5T214-320h146q17 0 28.5 11.5T400-280v146q0 17-11.5 28.5T360-94q-17 0-28.5-11.5T320-134v-49ZM171.5-411.5Q160-423 160-440v-360q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H520q-17 0-28.5-11.5T480-120q0-17 11.5-28.5T520-160h200v-440H560q-17 0-28.5-11.5T520-640v-160H240v360q0 17-11.5 28.5T200-400q-17 0-28.5-11.5Z" /></svg></span>
 <span class="nav-label">Export</span>
 </button>
 <button class="nav-item" data-panel="settings">
 <div class="nav-indicator"></div>
 <span class="nav-icon">
-<svg fill="currentColor" height="22" viewbox="0 -960 960 960" width="22" xmlns="http://www.w3.org/2000/svg">
-<path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"></path>
+<svg xmlns="http://www.w3.org/2000/svg" height="22" width="22" viewBox="0 -960 960 960" fill="currentColor">
+<path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z" />
 </svg>
 </span>
 <span class="nav-label">Settings</span>
 </button>
 </nav>
+
 </div>
+
 <!-- SNACKBAR -->
 <div id="snackbar"></div>
+
 <script>
 // ============================================================
 //  PYTHON KEYWORDS + BUILTINS FOR AUTOCOMPLETE
@@ -2377,19 +2171,19 @@ const moon = document.getElementById('icon-moon');
 if (t === 'dark') {
 // dark mode → show sun (to let user switch to light)
 sun.style.display = 'block';
-sun.setAttribute('fill', '#BACAAA');
+sun.setAttribute('fill', '#A0C0B4');
 moon.style.display = 'none';
 } else {
 // light mode → show moon (to let user switch to dark)
 moon.style.display = 'block';
-moon.setAttribute('fill', '#3A4728');
+moon.setAttribute('fill', '#2A4A40');
 sun.style.display = 'none';
 }
 document.querySelectorAll('.theme-pill').forEach(p => {
 p.classList.toggle('active', p.dataset.theme === t);
 });
 // update clear icon fills for theme
-const clearFill = t === 'dark' ? '#BACAAA': '#3A4728';
+const clearFill = t === 'dark' ? '#A0C0B4': '#2A4A40';
 document.querySelectorAll('#clear-code-btn svg, #clear-output-btn svg').forEach(s => s.setAttribute('fill', clearFill));
 document.querySelectorAll('#icon-export-nav, #icon-editor-nav').forEach(s => s.setAttribute('fill', clearFill));
 localStorage.setItem('pypad-theme', t);
@@ -2408,23 +2202,12 @@ p.addEventListener('click', () => setTheme(p.dataset.theme));
 // ============================================================
 function initSwitch(id, stateKey, callback) {
   const sw = document.getElementById(id);
+
   sw.addEventListener('click', () => {
     state[stateKey] = !state[stateKey];
     const isOn = state[stateKey];
-    const check = sw.querySelector('.switch-check');
-    if (!isOn && check) {
-      // hide checkmark IMMEDIATELY before thumb slides away
-      check.style.transition = 'none';
-      check.style.opacity = '0';
-    }
     sw.classList.toggle('on', isOn);
-    sw.setAttribute('aria-checked', isOn);
-    if (isOn && check) {
-      // show checkmark AFTER thumb finishes sliding in
-      check.style.transition = '';
-      // small delay so it fades in once thumb is in position
-      setTimeout(() => { check.style.opacity = '1'; }, 180);
-    }
+    sw.setAttribute('aria-checked', String(isOn));
     if (callback) callback(isOn);
   });
 }
@@ -2512,7 +2295,7 @@ row.innerHTML = `
 <div class="setting-label">${sn.name}</div>
 <div class="setting-sub" style="font-family:'JetBrains Mono',monospace;font-size:11px;">${sn.code.split('\n')[0]}…</div>
 </div>
-<span style="display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="#BACAAA"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z"/></svg></span>
+<span style="display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="#A0C0B4"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z"/></svg></span>
 `;
 row.addEventListener('click', () => {
 const cur = codeInput.value;
