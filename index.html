@@ -999,6 +999,84 @@ html, body {
   }
 }
 
+/* ============ DESKTOP LAYOUT ============
+   Top bar stays put. Bottom tab bar becomes a left sidebar.
+   Editor + Console go side by side with a draggable vertical divider.
+   FAB moves to bottom-right, clear of the sidebar. */
+@media (min-width: 900px) {
+
+  .app-shell { flex-direction: row; flex-wrap: wrap; }
+
+  .top-bar { width: 100%; order: 1; }
+
+  .bottom-nav {
+    order: 2;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 88px;
+    height: 100%;
+    padding: 16px 0;
+    gap: 4px;
+    border-top: none;
+    border-right: 1px solid var(--md-sys-color-outline-variant);
+    flex-shrink: 0;
+  }
+  .nav-item { flex: none; width: 100%; padding: 10px 4px; }
+  .nav-indicator { width: 64px; height: 40px; }
+
+  #panel-editor.panel.active,
+  #panel-export.panel.active,
+  #panel-settings.panel.active {
+    order: 3;
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    height: calc(100% - 0px);
+    overflow: hidden;
+  }
+
+  #panel-export.panel.active,
+  #panel-settings.panel.active { overflow-y: auto; display: block; }
+
+  #panel-editor.panel.active { flex-direction: row; }
+
+  .editor-section {
+    flex: 1 1 55%;
+    min-width: 240px;
+    height: 100%;
+  }
+
+  .resize-handle {
+    height: auto;
+    width: 6px;
+    cursor: ew-resize;
+    flex-shrink: 0;
+  }
+  .resize-handle::after {
+    width: 3px;
+    height: 32px;
+  }
+  .resize-handle:hover::after,
+  .resize-handle.dragging::after { height: 48px; width: 3px; }
+
+  .output-section {
+    border-top: none;
+    border-left: 1px solid var(--md-sys-color-outline-variant);
+    height: 100% !important;
+    max-height: none;
+    flex: 1 1 45%;
+    min-width: 220px;
+  }
+
+  .run-fab {
+    right: 24px;
+    bottom: 24px;
+  }
+
+  /* Console never auto-collapses on desktop — it's a permanent column */
+  .console-fab { display: none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1755,15 +1833,21 @@ document.getElementById('bottom-nav').querySelectorAll('.nav-item').forEach(btn 
   });
 });
 
-let resizing = false, resizeStartY = 0, resizeStartH = 0;
+let resizing = false, resizeStartY = 0, resizeStartH = 0, resizeStartX = 0, resizeStartW = 0;
+const isDesktop = () => window.matchMedia('(min-width: 900px)').matches;
 
 resizeHandle.addEventListener('mousedown', startResize);
 resizeHandle.addEventListener('touchstart', e => startResize(e.touches[0]), { passive: true });
 
 function startResize(e) {
   resizing = true;
-  resizeStartY = e.clientY;
-  resizeStartH = outputSection.offsetHeight;
+  if (isDesktop()) {
+    resizeStartX = e.clientX;
+    resizeStartW = outputSection.offsetWidth;
+  } else {
+    resizeStartY = e.clientY;
+    resizeStartH = outputSection.offsetHeight;
+  }
   resizeHandle.classList.add('dragging');
   document.addEventListener('mousemove', doResize);
   document.addEventListener('mouseup', endResize);
@@ -1773,10 +1857,19 @@ function startResize(e) {
 
 function doResize(e) {
   if (!resizing) return;
-  const delta = resizeStartY - e.clientY;
-  const newH = Math.max(80, Math.min(resizeStartH + delta, window.innerHeight * 0.65));
-  outputSection.style.height = newH + 'px';
-  checkCollapsed();
+  if (isDesktop()) {
+    const delta = resizeStartX - e.clientX;
+    const editorWrapper = document.getElementById('panel-editor');
+    const maxW = editorWrapper.offsetWidth - 220;
+    const newW = Math.max(220, Math.min(resizeStartW + delta, maxW));
+    outputSection.style.width = newW + 'px';
+    outputSection.style.flex = '0 0 ' + newW + 'px';
+  } else {
+    const delta = resizeStartY - e.clientY;
+    const newH = Math.max(80, Math.min(resizeStartH + delta, window.innerHeight * 0.65));
+    outputSection.style.height = newH + 'px';
+    checkCollapsed();
+  }
 }
 
 function endResize() {
