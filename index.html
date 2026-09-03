@@ -1103,7 +1103,7 @@ html, body {
 </div>
 <div class="brand-text">
 <span class="brand-name">PyPad</span>
-<span class="brand-sub">Python Interpreter</span>
+<span class="brand-sub">Python Interpreter · made by Bhuwan</span>
 </div>
 </div>
 <div class="top-actions">
@@ -1267,6 +1267,15 @@ wrap="off"
 <div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
 </button>
 </div>
+<div class="setting-row">
+<div class="setting-info">
+<div class="setting-label">Auto-close brackets &amp; quotes</div>
+<div class="setting-sub">Pair ( [ { " ' automatically</div>
+</div>
+<button class="m3-switch on" id="toggle-autopair" role="switch" aria-checked="true">
+<div class="m3-switch-thumb"><svg class="switch-check" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></div>
+</button>
+</div>
 </div>
 
 <div class="settings-section-title">About</div>
@@ -1379,6 +1388,7 @@ const PY_SNIPPETS = [
   { name: 'try/except', code: 'try:\n    pass\nexcept Exception as e:\n    print(e)', badge: 'sn' },
   { name: 'dict demo', code: "d = {'a': 1, 'b': 2}\nfor k, v in d.items():\n    print(k, v)", badge: 'sn' },
   { name: 'fibonacci', code: 'def fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        print(a)\n        a, b = b, a+b\nfib(10)', badge: 'sn' },
+  { name: 'HelloWorld("print")', code: 'def HelloWorld(y):\n    print("print")\nHelloWorld("print")', badge: 'sn' },
 ];
 
 const ALL_COMPLETIONS = [
@@ -1392,6 +1402,7 @@ const state = {
   showLineNumbers: true,
   autocompleteEnabled: true,
   autoIndentEnabled: true,
+  autoPairEnabled: true,
   acIndex: -1,
   acItems: [],
   isRunning: false,
@@ -1631,6 +1642,86 @@ function handleEnter() {
   return true;
 }
 
+const PAIR_OPEN = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
+const PAIR_CLOSE = { ')': '(', ']': '[', '}': '{', '"': '"', "'": "'" };
+const QUOTE_CHARS = new Set(['"', "'"]);
+
+function handleAutoPair(e, key) {
+  if (!state.autoPairEnabled) return false;
+  const start = codeInput.selectionStart;
+  const end = codeInput.selectionEnd;
+  const text = codeInput.value;
+
+  // Wrap current selection when typing an opening pair char
+  if ((PAIR_OPEN[key]) && start !== end) {
+    e.preventDefault();
+    const selected = text.slice(start, end);
+    const closeChar = PAIR_OPEN[key];
+    codeInput.value = text.slice(0, start) + key + selected + closeChar + text.slice(end);
+    codeInput.setSelectionRange(start + 1, start + 1 + selected.length);
+    updateHighlight();
+    return true;
+  }
+
+  // Quote chars: skip-over if same quote already follows, else insert pair
+  // (but don't auto-pair a quote right after a word char, e.g. it's -> it'|s)
+  if (QUOTE_CHARS.has(key) && start === end) {
+    const nextChar = text[start];
+    const prevChar = text[start - 1];
+    if (nextChar === key) {
+      e.preventDefault();
+      codeInput.setSelectionRange(start + 1, start + 1);
+      return true;
+    }
+    if (/[\w'"]/.test(prevChar || '')) return false;
+    e.preventDefault();
+    codeInput.value = text.slice(0, start) + key + key + text.slice(start);
+    codeInput.setSelectionRange(start + 1, start + 1);
+    updateHighlight();
+    return true;
+  }
+
+  // Bracket open chars: always insert the pair
+  if (PAIR_OPEN[key] && start === end && !QUOTE_CHARS.has(key)) {
+    e.preventDefault();
+    const closeChar = PAIR_OPEN[key];
+    codeInput.value = text.slice(0, start) + key + closeChar + text.slice(start);
+    codeInput.setSelectionRange(start + 1, start + 1);
+    updateHighlight();
+    return true;
+  }
+
+  // Closing chars: skip over if the next char is already that closer
+  if (PAIR_CLOSE[key] && start === end) {
+    const nextChar = text[start];
+    if (nextChar === key) {
+      e.preventDefault();
+      codeInput.setSelectionRange(start + 1, start + 1);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function handleAutoPairBackspace(e) {
+  if (!state.autoPairEnabled) return false;
+  const start = codeInput.selectionStart;
+  const end = codeInput.selectionEnd;
+  if (start !== end) return false;
+  const text = codeInput.value;
+  const prevChar = text[start - 1];
+  const nextChar = text[start];
+  if (PAIR_OPEN[prevChar] && nextChar === PAIR_OPEN[prevChar]) {
+    e.preventDefault();
+    codeInput.value = text.slice(0, start - 1) + text.slice(start + 1);
+    codeInput.setSelectionRange(start - 1, start - 1);
+    updateHighlight();
+    return true;
+  }
+  return false;
+}
+
 codeInput.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     e.preventDefault();
@@ -1679,6 +1770,19 @@ codeInput.addEventListener('keydown', e => {
 
   if (e.key === 'Backspace') {
     hideAC();
+    return;
+  }
+});
+
+codeInput.addEventListener('beforeinput', e => {
+  if (!state.autoPairEnabled) return;
+
+  if (e.inputType === 'insertText' && e.data && (PAIR_OPEN[e.data] || PAIR_CLOSE[e.data])) {
+    if (handleAutoPair(e, e.data)) return;
+  }
+
+  if (e.inputType === 'deleteContentBackward') {
+    handleAutoPairBackspace(e);
   }
 });
 
@@ -1970,6 +2074,7 @@ initSwitch('toggle-autocomplete', 'autocompleteEnabled', v => {
   if (!v) hideAC();
 });
 initSwitch('toggle-indent', 'autoIndentEnabled');
+initSwitch('toggle-autopair', 'autoPairEnabled');
 
 document.getElementById('font-size-select').addEventListener('change', e => {
   const sz = e.target.value + 'px';
