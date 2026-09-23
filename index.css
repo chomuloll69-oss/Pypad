@@ -366,9 +366,9 @@ html, body {
   caret-color: var(--md-sys-color-primary);
   position: relative;
   z-index: 2;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: hidden;
   tab-size: 4;
   -webkit-text-fill-color: transparent;
 }
