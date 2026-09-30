@@ -10,9 +10,13 @@ export class PyRunner {
     this.worker?.terminate();
     this.ready = false;
     this.worker = new Worker("./pyodide-worker.js");
-    this.sab = new SharedArrayBuffer(8 + 4096);
-    this.ia = new Int32Array(this.sab);
-    this.worker.postMessage({ type: "init-input", buffer: this.sab });
+    // SharedArrayBuffer only exists when COOP/COEP headers are sent; without it input() is disabled but everything else works
+    this.sab = typeof SharedArrayBuffer !== "undefined" && self.crossOriginIsolated ? new SharedArrayBuffer(8 + 4096) : null;
+    if (this.sab) {
+      this.ia = new Int32Array(this.sab);
+      this.worker.postMessage({ type: "init-input", buffer: this.sab });
+    }
+    this.worker.onerror = (e) => { this.h.onStderr?.("Worker failed: " + (e.message || "could not load pyodide-worker.js")); this.h.onStatus?.("error"); };
     this.worker.onmessage = ({ data: m }) => {
       const h = this.h;
       if (m.type === "ready") { this.ready = true; h.onStatus?.("ready"); }
@@ -30,6 +34,7 @@ export class PyRunner {
   }
 
   #reply(text) {
+    if (!this.sab) return;
     const bytes = new TextEncoder().encode(text).slice(0, 4096);
     new Uint8Array(this.sab).set(bytes, 8);
     this.ia[1] = bytes.length;
