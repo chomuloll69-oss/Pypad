@@ -36,6 +36,7 @@ class PyRunner {
 }
 
 const py = new PyRunner({
+  onReady: () => showSnack('Python ready'),
   onStdout: t => appendOutput(t),
   onStderr: t => appendOutput(t, 'error'),
   onStatus: t => appendOutput(t, 'info'),
