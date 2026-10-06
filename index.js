@@ -669,17 +669,17 @@ function setTheme(t) {
   const moon = document.getElementById('icon-moon');
   if (t === 'dark') {
     sun.style.display = 'block';
-    sun.style.color = '#C8C5D0';
+    sun.style.color = '#C9C4D6';
     moon.style.display = 'none';
   } else {
     moon.style.display = 'block';
-    moon.style.color = '#47464F';
+    moon.style.color = '#484553';
     sun.style.display = 'none';
   }
   document.querySelectorAll('.theme-pill').forEach(p => {
     p.classList.toggle('active', p.dataset.theme === t);
   });
-  const clearFill = t === 'dark' ? '#C8C5D0' : '#47464F';
+  const clearFill = t === 'dark' ? '#C9C4D6' : '#484553';
   document.querySelectorAll('#clear-code-btn span, #clear-output-btn svg').forEach(s => { if (s.tagName === 'svg') s.setAttribute('fill', clearFill); else s.style.color = clearFill; });
   const iconExportNav = document.getElementById('icon-export-nav');
   if (iconExportNav) iconExportNav.style.color = clearFill;
@@ -786,7 +786,7 @@ PY_SNIPPETS.forEach(sn => {
       <div class="setting-label">${sn.name}</div>
       <div class="setting-sub" style="font-family:'JetBrains Mono',monospace;font-size:11px;">${sn.code.split('\n')[0]}...</div>
     </div>
-    <span style="display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="#C8C5D0"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z" /></svg></span>
+    <span style="display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 -960 960 960" fill="#C9C4D6"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v80q0 17-11.5 28.5T640-640H320q-17 0-28.5-11.5T280-680v-80h-80v560Zm308.5-571.5Q520-783 520-800t-11.5-28.5Q497-840 480-840t-28.5 11.5Q440-817 440-800t11.5 28.5Q463-760 480-760t28.5-11.5Z" /></svg></span>
   `;
   row.addEventListener('click', () => {
     const cur = codeInput.value;
