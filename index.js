@@ -37,8 +37,8 @@ class PyRunner {
 
 const py = new PyRunner({
   onReady: () => showSnack('Python ready'),
-  onStdout: t => appendOutput(t),
-  onStderr: t => appendOutput(t, 'error'),
+  onStdout: t => appendRaw(t),
+  onStderr: t => appendRaw(t, 'error'),
   onStatus: t => appendOutput(t, 'info'),
   onPlot: src => {
     const im = new Image();
@@ -525,7 +525,23 @@ function setStatus(s) {
   statusDot.className = 'status-dot ' + s;
 }
 
+let atLineStart = true;
+
+// raw stream text (print/stderr): no newline added, so end='' works
+function appendRaw(text, cls = '') {
+  if (!text) return;
+  const span = document.createElement('span');
+  span.className = 'out-raw' + (cls ? ' ' + cls : '');
+  span.textContent = text;
+  outputEl.appendChild(span);
+  atLineStart = text.endsWith('\n');
+  outputEl.scrollTop = outputEl.scrollHeight;
+  markOutputBadge();
+}
+
 function appendOutput(text, cls = '') {
+  // finish a half-written line (print(..., end='')) before a status line
+  if (!atLineStart) { outputEl.appendChild(document.createTextNode('\n')); atLineStart = true; }
   const span = document.createElement('span');
   span.className = 'out-line' + (cls ? ' ' + cls : '');
   span.textContent = text;
@@ -546,6 +562,7 @@ function runCode() {
   setStatus('running');
 
   outputEl.innerHTML = '';
+  atLineStart = true;
   appendOutput('Running...', 'system');
 
   const ripple = document.createElement('div');
@@ -759,6 +776,7 @@ document.getElementById('clear-all-btn').addEventListener('click', () => {
   if (!codeInput.value.trim()) { showSnack('Already empty'); return; }
   codeInput.value = '';
   updateHighlight();
+  atLineStart = true;
   outputEl.innerHTML = '<span class="out-line info">Cleared. Ready.</span>';
   setStatus('');
   showSnack('Cleared');
@@ -771,6 +789,7 @@ document.getElementById('clear-code-btn').addEventListener('click', () => {
 });
 
 document.getElementById('clear-output-btn').addEventListener('click', () => {
+  atLineStart = true;
   outputEl.innerHTML = '<span class="out-line info">Output cleared.</span>';
   setStatus('');
   consoleFab.classList.remove('has-output');

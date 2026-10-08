@@ -27,9 +27,14 @@ plt.show = _show
 
 const ready = (async () => {
   py = await loadPyodide();
-  py.setStdout({ batched: s => post({ type: 'stdout', text: s }) });
-  py.setStderr({ batched: s => post({ type: 'stderr', text: s }) });
-  py.runPython('import builtins, js\nbuiltins.input = lambda p="": js.__input(str(p))');
+  // write handler: chunks go out as-is (no added newline), so print(..., end='') isn't swallowed
+  const stream = type => {
+    const dec = new TextDecoder();
+    return { write: buf => { const text = dec.decode(buf, { stream: true }); if (text) post({ type, text }); return buf.length; } };
+  };
+  py.setStdout(stream('stdout'));
+  py.setStderr(stream('stderr'));
+  py.runPython('import builtins, js, sys\ndef _input(p=""):\n    sys.stdout.flush()\n    return js.__input(str(p))\nbuiltins.input = _input');
   post({ type: 'ready' });
 })();
 
@@ -43,7 +48,8 @@ onmessage = async e => {
     if (needsPkgs) post({ type: 'status', text: 'Loading packages (first time only)...' });
     await py.loadPackagesFromImports(m.code);
     if (!mplPatched && /matplotlib/.test(m.code)) { await py.runPythonAsync(MPL); mplPatched = true; }
-    await py.runPythonAsync(m.code);
+    try { await py.runPythonAsync(m.code); }
+    finally { py.runPython('import sys\nsys.stdout.flush()\nsys.stderr.flush()'); }
     post({ type: 'done' });
   } catch (err) { post({ type: 'error', text: String(err.message || err) }); }
 };

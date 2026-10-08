@@ -557,6 +557,7 @@ html, body {
 }
 
 #output .out-line { display: block; }
+#output .out-raw.error { color: var(--md-sys-color-error); }
 #output .out-line.error { color: var(--md-sys-color-error); }
 #output .out-line.success { color: #B8E0C4; }
 #output .out-line.info { color: var(--md-sys-color-on-surface-variant); font-style: italic; }
