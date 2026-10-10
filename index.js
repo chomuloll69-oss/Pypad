@@ -109,6 +109,7 @@ const state = {
 const codeInput = document.getElementById('code-input');
 const highlightLayer = document.getElementById('highlight-layer');
 const lineNumbers = document.getElementById('line-numbers');
+const lineNumbersInner = document.getElementById('line-numbers-inner');
 const outputEl = document.getElementById('output');
 const acBox = document.getElementById('autocomplete-box');
 const runFab = document.getElementById('run-fab');
@@ -220,12 +221,12 @@ function updateLineNumbers(code) {
   if (!state.showLineNumbers) { lineNumbers.style.display = 'none'; return; }
   lineNumbers.style.display = '';
   const count = (code.match(/\n/g) || []).length + 1;
-  lineNumbers.textContent = Array.from({ length: count }, (_, i) => i + 1).join('\n');
+  lineNumbersInner.textContent = Array.from({ length: count }, (_, i) => i + 1).join('\n');
 }
 
 function syncScroll() {
   highlightLayer.style.transform = `translateY(-${codeInput.scrollTop}px) translateX(-${codeInput.scrollLeft}px)`;
-  lineNumbers.style.transform = `translateY(-${codeInput.scrollTop}px)`;
+  lineNumbersInner.style.transform = `translateY(-${codeInput.scrollTop}px)`;
 }
 codeInput.addEventListener('scroll', syncScroll);
 
