@@ -783,14 +783,16 @@ function setTheme(t) {
   document.body.classList.toggle('light-theme', t === 'light');
   const sun = document.getElementById('icon-sun');
   const moon = document.getElementById('icon-moon');
-  if (t === 'dark') {
-    sun.style.display = 'block';
-    sun.style.color = '#C9C4D6';
-    moon.style.display = 'none';
-  } else {
-    moon.style.display = 'block';
-    moon.style.color = '#484553';
-    sun.style.display = 'none';
+  if (sun && moon) {
+    if (t === 'dark') {
+      sun.style.display = 'block';
+      sun.style.color = '#C9C4D6';
+      moon.style.display = 'none';
+    } else {
+      moon.style.display = 'block';
+      moon.style.color = '#484553';
+      sun.style.display = 'none';
+    }
   }
   document.querySelectorAll('.theme-pill').forEach(p => {
     p.classList.toggle('active', p.dataset.theme === t);
@@ -803,10 +805,6 @@ function setTheme(t) {
   if (iconEditorNav) iconEditorNav.style.color = clearFill;
   localStorage.setItem('pypad-theme', t);
 }
-
-document.getElementById('theme-toggle-btn').addEventListener('click', () => {
-  setTheme(state.theme === 'dark' ? 'light' : 'dark');
-});
 
 document.querySelectorAll('.theme-pill').forEach(p => {
   p.addEventListener('click', () => setTheme(p.dataset.theme));
@@ -879,12 +877,6 @@ document.getElementById('clear-all-btn').addEventListener('click', () => {
   outputEl.innerHTML = '<span class="out-line info">Cleared. Ready.</span>';
   setStatus('');
   showSnack('Cleared');
-});
-
-document.getElementById('clear-code-btn').addEventListener('click', () => {
-  codeInput.value = '';
-  updateHighlight();
-  showSnack('Editor cleared');
 });
 
 document.getElementById('clear-output-btn').addEventListener('click', () => {
