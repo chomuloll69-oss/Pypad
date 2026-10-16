@@ -68,9 +68,9 @@ const py = new PyRunner({
     outputEl.scrollTop = outputEl.scrollHeight;
   },
   onInput: p => window.prompt(p || 'Input:') || '',
-  onDone: () => { setStatus('success'); appendOutput('Done', 'success'); resetFab(); },
-  onError: msg => { setStatus('error'); appendOutput(String(msg).replace(/^PythonError: /, '').replace('Traceback (most recent call last):\n', ''), 'error'); resetFab(); },
-  onStopped: () => { setStatus(''); appendOutput('Stopped', 'info'); resetFab(); }
+  onDone: () => { setStatus('success'); appendOutput('Done · took ' + stopTimer(), 'success'); resetFab(); },
+  onError: msg => { const t = stopTimer(); setStatus('error'); appendOutput(String(msg).replace(/^PythonError: /, '').replace('Traceback (most recent call last):\n', ''), 'error'); appendOutput('Failed · took ' + t, 'error'); resetFab(); },
+  onStopped: () => { setStatus(''); appendOutput('Stopped · after ' + stopTimer(), 'info'); resetFab(); }
 });
 
 const PY_KEYWORDS = [
@@ -566,6 +566,34 @@ function appendOutput(text, cls = '') {
   outputEl.appendChild(document.createTextNode('\n'));
   outputEl.scrollTop = outputEl.scrollHeight;
   if (cls !== 'info') markOutputBadge();
+  return span;
+}
+
+// ---- run timer (starship-style "took 1.2s") ----
+let runT0 = 0, runTick = null, runLine = null;
+
+function fmtTime(ms) {
+  if (ms < 1000) return Math.round(ms) + 'ms';
+  if (ms < 60000) return (ms / 1000).toFixed(1) + 's';
+  return Math.floor(ms / 60000) + 'm ' + Math.round((ms % 60000) / 1000) + 's';
+}
+
+function startTimer(line) {
+  clearInterval(runTick);
+  runT0 = performance.now();
+  runLine = line;
+  runTick = setInterval(() => {
+    if (runLine) runLine.textContent = 'Running... ' + fmtTime(performance.now() - runT0);
+  }, 100);
+}
+
+function stopTimer() {
+  clearInterval(runTick);
+  runTick = null;
+  const t = fmtTime(performance.now() - runT0);
+  if (runLine) runLine.textContent = 'Running...';
+  runLine = null;
+  return t;
 }
 
 function runCode() {
@@ -580,7 +608,7 @@ function runCode() {
 
   outputEl.innerHTML = '';
   atLineStart = true;
-  appendOutput('Running...', 'system');
+  startTimer(appendOutput('Running...', 'system'));
 
   const ripple = document.createElement('div');
   ripple.className = 'fab-ripple';
