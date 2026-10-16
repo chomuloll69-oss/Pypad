@@ -1089,3 +1089,6 @@ html, body {
   .console-fab { display: none !important; }
 }
 
+#readme{
+  color: var(--md-sys-color-primary)
+}
