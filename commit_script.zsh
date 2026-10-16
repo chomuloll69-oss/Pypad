@@ -1,3 +1,5 @@
+#! /data/data/com.termux/files/usr/bin/zsh
+
 read "message?write commit message: "
 
 git add -A
