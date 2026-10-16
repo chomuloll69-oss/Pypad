@@ -1,5 +1,7 @@
 // pyodide-worker.js — classic worker, runs Python off the main thread
+const T0 = performance.now();
 importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');
+const tScript = performance.now() - T0;
 let py, ia, ib, mplPatched = false;
 const post = m => postMessage(m);
 
@@ -26,7 +28,9 @@ plt.show = _show
 `;
 
 const ready = (async () => {
+  const t1 = performance.now();
   py = await loadPyodide();
+  const tInit = performance.now() - t1;
   // write handler: chunks go out as-is (no added newline), so print(..., end='') isn't swallowed
   const stream = type => {
     const dec = new TextDecoder();
@@ -35,7 +39,7 @@ const ready = (async () => {
   py.setStdout(stream('stdout'));
   py.setStderr(stream('stderr'));
   py.runPython('import builtins, js, sys\ndef _input(p=""):\n    sys.stdout.flush()\n    return js.__input(str(p))\nbuiltins.input = _input');
-  post({ type: 'ready' });
+  post({ type: 'ready', boot: { script: tScript, init: tInit } });
 })();
 
 onmessage = async e => {

@@ -1,3 +1,6 @@
+// open the site with ?debug to see engine boot breakdown + cache info
+const DEBUG = /[?&]debug\b/.test(location.search);
+
 // ---- Pyodide engine (classic script, no modules) ----
 class PyRunner {
   constructor(h) { this.h = h; this.ready = false; this.queued = null; this.boot(); }
@@ -21,6 +24,7 @@ class PyRunner {
   spawn() {
     if (this.worker) this.worker.terminate();
     this.ready = false;
+    this.t0 = performance.now();
     this.worker = new Worker('pyodide-worker.js');
     // SharedArrayBuffer (needed only for input()) exists only with COOP/COEP headers (Vercel yes, plain live server no)
     this.sab = (typeof SharedArrayBuffer !== 'undefined' && self.crossOriginIsolated) ? new SharedArrayBuffer(8 + 4096) : null;
@@ -31,7 +35,7 @@ class PyRunner {
     this.worker.onerror = e => this.h.onError('Worker failed: ' + (e.message || 'could not load pyodide-worker.js'));
     this.worker.onmessage = ({ data: m }) => {
       const h = this.h;
-      if (m.type === 'ready') { this.ready = true; h.onReady && h.onReady(); }
+      if (m.type === 'ready') { this.ready = true; h.onReady && h.onReady(m.boot); }
       else if (m.type === 'stdout') h.onStdout(m.text);
       else if (m.type === 'stderr') h.onStderr(m.text);
       else if (m.type === 'plot') h.onPlot('data:image/png;base64,' + m.png);
@@ -56,7 +60,22 @@ class PyRunner {
 }
 
 const py = new PyRunner({
-  onReady: () => showSnack('Python ready'),
+  onReady: b => {
+    showSnack('Python ready');
+    appendOutput('Python engine ready · ' + fmtTime(performance.now() - py.t0), 'info');
+    // user hit Run before the engine was up: freeze the "Starting" line, start timing the real run
+    if (state.isRunning && runLabel.startsWith('Starting')) {
+      stopTimer();
+      startTimer(appendOutput('Running...', 'system'), 'Running...');
+    }
+    if (DEBUG && b) {
+      (async () => {
+        let n = '?';
+        try { n = (await (await caches.open('pyodide-cache-v1')).keys()).length; } catch {}
+        appendOutput('debug · script ' + fmtTime(b.script) + ' + init ' + fmtTime(b.init) + ' · cached files: ' + n, 'info');
+      })();
+    }
+  },
   onStdout: t => appendRaw(t),
   onStderr: t => appendRaw(t, 'error'),
   onStatus: t => appendOutput(t, 'info'),
@@ -70,7 +89,7 @@ const py = new PyRunner({
   onInput: p => window.prompt(p || 'Input:') || '',
   onDone: () => { setStatus('success'); appendOutput('Done · took ' + stopTimer(), 'success'); resetFab(); },
   onError: msg => { const t = stopTimer(); setStatus('error'); appendOutput(String(msg).replace(/^PythonError: /, '').replace('Traceback (most recent call last):\n', ''), 'error'); appendOutput('Failed · took ' + t, 'error'); resetFab(); },
-  onStopped: () => { setStatus(''); appendOutput('Stopped · after ' + stopTimer(), 'info'); resetFab(); }
+  onStopped: () => { setStatus(''); appendOutput('Stopped · after ' + stopTimer(), 'info'); showSnack('Restarting Python engine...'); resetFab(); }
 });
 
 const PY_KEYWORDS = [
@@ -570,7 +589,7 @@ function appendOutput(text, cls = '') {
 }
 
 // ---- run timer (starship-style "took 1.2s") ----
-let runT0 = 0, runTick = null, runLine = null;
+let runT0 = 0, runTick = null, runLine = null, runLabel = 'Running...';
 
 function fmtTime(ms) {
   if (ms < 1000) return Math.round(ms) + 'ms';
@@ -578,12 +597,13 @@ function fmtTime(ms) {
   return Math.floor(ms / 60000) + 'm ' + Math.round((ms % 60000) / 1000) + 's';
 }
 
-function startTimer(line) {
+function startTimer(line, label = 'Running...') {
   clearInterval(runTick);
   runT0 = performance.now();
   runLine = line;
+  runLabel = label;
   runTick = setInterval(() => {
-    if (runLine) runLine.textContent = 'Running... ' + fmtTime(performance.now() - runT0);
+    if (runLine) runLine.textContent = runLabel + ' ' + fmtTime(performance.now() - runT0);
   }, 100);
 }
 
@@ -591,7 +611,7 @@ function stopTimer() {
   clearInterval(runTick);
   runTick = null;
   const t = fmtTime(performance.now() - runT0);
-  if (runLine) runLine.textContent = 'Running...';
+  if (runLine) runLine.textContent = runLabel;
   runLine = null;
   return t;
 }
@@ -608,7 +628,8 @@ function runCode() {
 
   outputEl.innerHTML = '';
   atLineStart = true;
-  startTimer(appendOutput('Running...', 'system'));
+  if (py.ready) startTimer(appendOutput('Running...', 'system'), 'Running...');
+  else startTimer(appendOutput('Starting Python engine...', 'system'), 'Starting Python engine...');
 
   const ripple = document.createElement('div');
   ripple.className = 'fab-ripple';
@@ -616,7 +637,6 @@ function runCode() {
   runFab.appendChild(ripple);
   setTimeout(() => ripple.remove(), 500);
 
-  if (!py.ready) appendOutput('Loading Python engine (first time only)...', 'info');
   py.run(code);
 }
 
@@ -879,6 +899,7 @@ document.addEventListener('touchstart', e => {
 
 codeInput.value = '';
 updateHighlight();
+if (!py.ready) appendOutput('Loading Python engine...', 'info');
 
 const savedTheme = localStorage.getItem('pypad-theme') || 'dark';
 setTheme(savedTheme);

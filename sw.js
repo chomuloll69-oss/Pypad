@@ -1,5 +1,5 @@
 const PYO = 'pyodide-cache-v1';  // pinned version, never changes
-const SHELL = 'pypad-shell-v1';  // your files + fonts
+const SHELL = 'pypad-shell-v2';  // your files + fonts
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -19,7 +19,7 @@ async function cacheFirst(req, name) {
   const hit = await c.match(req);
   if (hit) return hit;
   const r = await fetch(req);
-  if (r.ok) c.put(req, r.clone());
+  if (r.ok || r.type === 'opaque') c.put(req, r.clone()); // pyodide.js via importScripts is opaque
   return r;
 }
 
