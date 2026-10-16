@@ -1,6 +1,23 @@
 // ---- Pyodide engine (classic script, no modules) ----
 class PyRunner {
-  constructor(h) { this.h = h; this.ready = false; this.spawn(); }
+  constructor(h) { this.h = h; this.ready = false; this.queued = null; this.boot(); }
+  async boot() {
+    // let the service worker take control first so Pyodide downloads get cached on visit #1
+    if ('serviceWorker' in navigator) {
+      try {
+        await navigator.serviceWorker.register('sw.js');
+        await navigator.serviceWorker.ready;
+        if (!navigator.serviceWorker.controller) {
+          await new Promise(r => {
+            navigator.serviceWorker.addEventListener('controllerchange', r, { once: true });
+            setTimeout(r, 3000); // don't wait forever
+          });
+        }
+      } catch {}
+    }
+    this.spawn();
+    if (this.queued !== null) { const q = this.queued; this.queued = null; this.run(q); }
+  }
   spawn() {
     if (this.worker) this.worker.terminate();
     this.ready = false;
@@ -31,7 +48,10 @@ class PyRunner {
       }
     };
   }
-  run(code) { this.worker.postMessage({ type: 'run', code }); }
+  run(code) {
+    if (!this.worker) { this.queued = code; return; } // worker not booted yet, run once it is
+    this.worker.postMessage({ type: 'run', code });
+  }
   stop() { this.spawn(); this.h.onStopped(); } // kills infinite loops for real
 }
 
@@ -52,9 +72,6 @@ const py = new PyRunner({
   onError: msg => { setStatus('error'); appendOutput(String(msg).replace(/^PythonError: /, '').replace('Traceback (most recent call last):\n', ''), 'error'); resetFab(); },
   onStopped: () => { setStatus(''); appendOutput('Stopped', 'info'); resetFab(); }
 });
-
-// cache Pyodide files so it loads fast after the first visit
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 const PY_KEYWORDS = [
   'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break',
@@ -102,8 +119,7 @@ const state = {
   shellItalicEnabled: true,
   acIndex: -1,
   acItems: [],
-  isRunning: false,
-  skulptReady: false
+  isRunning: false
 };
 
 const codeInput = document.getElementById('code-input');
