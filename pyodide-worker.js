@@ -2,7 +2,12 @@
 const T0 = performance.now();
 importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');
 const tScript = performance.now() - T0;
-let py, ia, ib, mplPatched = false;
+let py, ia, ib, mplPatched = false, ibuf = null, runSeq = 0, cancelledUpTo = 0;
+// an interrupted top-level-await run re-throws KeyboardInterrupt out of asyncio's loop; the run's own catch reports it
+addEventListener('error', e => {
+  const s = String(e.message || '') + ' ' + String((e.error && (e.error.type || e.error.message)) || '');
+  if (s.includes('KeyboardInterrupt')) e.preventDefault();
+});
 const post = m => postMessage(m);
 
 globalThis.__plot = b64 => post({ type: 'plot', png: b64 });
@@ -38,6 +43,7 @@ const ready = (async () => {
   };
   py.setStdout(stream('stdout'));
   py.setStderr(stream('stderr'));
+  if (ibuf) py.setInterruptBuffer(ibuf);
   py.runPython('import builtins, js, sys\ndef _input(p=""):\n    sys.stdout.flush()\n    return js.__input(str(p))\nbuiltins.input = _input');
   post({ type: 'ready', boot: { script: tScript, init: tInit } });
 })();
@@ -45,14 +51,25 @@ const ready = (async () => {
 onmessage = async e => {
   const m = e.data;
   if (m.type === 'init-input') { ia = new Int32Array(m.buffer); ib = new Uint8Array(m.buffer); return; }
+  if (m.type === 'init-interrupt') { ibuf = new Uint8Array(m.buffer); if (py) py.setInterruptBuffer(ibuf); return; }
+  if (m.type === 'cancel') { cancelledUpTo = runSeq; return; } // Stop pressed while the engine was still booting
   if (m.type !== 'run') return;
+  const my = ++runSeq;
   await ready;
+  if (cancelledUpTo >= my) return;
+  if (ibuf) ibuf[0] = 0;
+  post({ type: 'phase', v: 'loading' });
   try {
     const needsPkgs = /^\s*(import|from)\s+(numpy|matplotlib|pandas|scipy|sympy)/m.test(m.code);
     if (needsPkgs) post({ type: 'status', text: 'Loading packages (first time only)...' });
     await py.loadPackagesFromImports(m.code);
     if (!mplPatched && /matplotlib/.test(m.code)) { await py.runPythonAsync(MPL); mplPatched = true; }
-    try { await py.runPythonAsync(m.code); }
+    if (ibuf && ibuf[0] === 2) { ibuf[0] = 0; throw new Error('KeyboardInterrupt'); } // Stop pressed while loading
+    post({ type: 'phase', v: 'running' });
+    try {
+      // plain runPython: KeyboardInterrupt comes back as a normal catchable error. Top-level await needs the async runner.
+      if (/\bawait\b/.test(m.code)) await py.runPythonAsync(m.code); else py.runPython(m.code);
+    }
     finally { py.runPython('import sys\nsys.stdout.flush()\nsys.stderr.flush()'); }
     post({ type: 'done' });
   } catch (err) { post({ type: 'error', text: String(err.message || err) }); }

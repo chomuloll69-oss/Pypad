@@ -25,6 +25,8 @@ class PyRunner {
     if (this.worker) this.worker.terminate();
     this.ready = false;
     this.t0 = performance.now();
+    clearTimeout(this.killTimer); this.killTimer = null;
+    this.stopping = false; this.busy = false; this.phase = 'idle';
     this.worker = new Worker('pyodide-worker.js');
     // SharedArrayBuffer (needed only for input()) exists only with COOP/COEP headers (Vercel yes, plain live server no)
     this.sab = (typeof SharedArrayBuffer !== 'undefined' && self.crossOriginIsolated) ? new SharedArrayBuffer(8 + 4096) : null;
@@ -32,7 +34,13 @@ class PyRunner {
       this.ia = new Int32Array(this.sab);
       this.worker.postMessage({ type: 'init-input', buffer: this.sab });
     }
-    this.worker.onerror = e => this.h.onError('Worker failed: ' + (e.message || 'could not load pyodide-worker.js'));
+    // interrupt flag: lets Stop raise KeyboardInterrupt instead of killing (and re-booting) the engine
+    this.ibuf = (typeof SharedArrayBuffer !== 'undefined' && self.crossOriginIsolated) ? new Uint8Array(new SharedArrayBuffer(1)) : null;
+    if (this.ibuf) this.worker.postMessage({ type: 'init-interrupt', buffer: this.ibuf.buffer });
+    this.worker.onerror = e => {
+      if (this.stopping) return; // KeyboardInterrupt noise while stopping
+      this.h.onError('Worker failed: ' + (e.message || 'could not load pyodide-worker.js'));
+    };
     this.worker.onmessage = ({ data: m }) => {
       const h = this.h;
       if (m.type === 'ready') { this.ready = true; h.onReady && h.onReady(m.boot); }
@@ -40,8 +48,12 @@ class PyRunner {
       else if (m.type === 'stderr') h.onStderr(m.text);
       else if (m.type === 'plot') h.onPlot('data:image/png;base64,' + m.png);
       else if (m.type === 'status') h.onStatus(m.text);
-      else if (m.type === 'error') h.onError(m.text);
-      else if (m.type === 'done') h.onDone();
+      else if (m.type === 'phase') {
+        this.phase = m.v;
+        if (m.v === 'running' && this.stopping && !this.killTimer) this.killTimer = setTimeout(() => this.hardStop(), 1500);
+      }
+      else if (m.type === 'error') { const was = this.stopping; this.finish(); was ? h.onStopped(false) : h.onError(m.text); }
+      else if (m.type === 'done') { this.finish(); h.onDone(); }
       else if (m.type === 'input') {
         const v = String(h.onInput(m.prompt) || '');
         const bytes = new TextEncoder().encode(v).slice(0, 4096);
@@ -53,10 +65,32 @@ class PyRunner {
     };
   }
   run(code) {
+    this.busy = true; this.phase = 'loading';
     if (!this.worker) { this.queued = code; return; } // worker not booted yet, run once it is
     this.worker.postMessage({ type: 'run', code });
   }
-  stop() { this.spawn(); this.h.onStopped(); } // kills infinite loops for real
+  finish() {
+    clearTimeout(this.killTimer); this.killTimer = null;
+    this.stopping = false; this.busy = false; this.phase = 'idle';
+    if (this.ibuf) this.ibuf[0] = 0;
+  }
+  hardStop() { this.spawn(); this.h.onStopped(true); } // last resort: kill the worker (engine must re-boot)
+  stop() {
+    if (!this.ready) { // engine still booting: just cancel the queued run, keep booting
+      if (this.worker) this.worker.postMessage({ type: 'cancel' }); else this.queued = null;
+      this.busy = false; this.phase = 'idle';
+      this.h.onStopped(false);
+    } else if (!this.busy) {
+      this.h.onStopped(false);
+    } else if (this.stopping || !this.ibuf) {
+      this.hardStop(); // second tap, or no SharedArrayBuffer (no COOP/COEP headers)
+    } else {
+      this.stopping = true;
+      this.ibuf[0] = 2; // SIGINT -> KeyboardInterrupt inside Python
+      // pure-Python loops stop in ms; stuck C code (time.sleep, huge numpy) gets killed after 1.5s
+      if (this.phase === 'running') this.killTimer = setTimeout(() => this.hardStop(), 1500);
+    }
+  }
 }
 
 const py = new PyRunner({
@@ -89,7 +123,7 @@ const py = new PyRunner({
   onInput: p => window.prompt(p || 'Input:') || '',
   onDone: () => { setStatus('success'); appendOutput('Done · took ' + stopTimer(), 'success'); resetFab(); },
   onError: msg => { const t = stopTimer(); setStatus('error'); appendOutput(String(msg).replace(/^PythonError: /, '').replace('Traceback (most recent call last):\n', ''), 'error'); appendOutput('Failed · took ' + t, 'error'); resetFab(); },
-  onStopped: () => { setStatus(''); appendOutput('Stopped · after ' + stopTimer(), 'info'); showSnack('Restarting Python engine...'); resetFab(); }
+  onStopped: restarted => { setStatus(''); appendOutput('Stopped · after ' + stopTimer(), 'info'); if (restarted) showSnack('Restarting Python engine...'); resetFab(); }
 });
 
 const PY_KEYWORDS = [
