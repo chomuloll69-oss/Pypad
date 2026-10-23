@@ -1,4 +1,4 @@
-# PyPad — python in your browser
+# Pyzer — python in your browser
 
 ---
 
@@ -56,7 +56,7 @@ Built on plain html, CSS, and JavaScript with pyodide as Running engine for the 
 ## Building
 Anybody who wants to run it locally can clone this repo
 ```bash
-git clone https://github.com/chomuloll69-oss/pypad
+git clone https://github.com/chomuloll69-oss/Pyzer
 ```
 And run it locally using a web server.
 
