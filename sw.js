@@ -1,5 +1,5 @@
 const PYO = 'pyodide-cache-v1';  // pinned version, never changes
-const SHELL = 'pypad-shell-v3';  // your files + fonts
+const SHELL = 'Pyzer-shell-v3';  // your files + fonts
 
 self.addEventListener('install', e => {
   self.skipWaiting();

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,slnt,wdth,wght,GRAD,ROND@6..144,-10..0,25..151,1..1000,0..100,0..100&display=swap');
+
 body.shell-italic-off {
   --shell-font-style: normal;
 }
@@ -120,7 +122,10 @@ body.shell-italic-off {
   --theme-on-primary: #F7F1FF;
   --theme-outline: #797585;
   --theme-outline-variant: #CAC0DD;
+
+  
 }
+
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -211,7 +216,7 @@ html, body {
   line-height: 1.4;
 }
 
-/* header: [logo] [PyPad] [badge] / [subtitle across the full width] */
+/* header: [logo] [Pyzer] [badge] / [subtitle across the full width] */
 .top-bar {
   display: grid;
   grid-template-columns: auto 1fr auto;

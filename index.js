@@ -803,7 +803,7 @@ function setTheme(t) {
   if (iconExportNav) iconExportNav.style.color = clearFill;
   const iconEditorNav = document.getElementById('icon-editor-nav');
   if (iconEditorNav) iconEditorNav.style.color = clearFill;
-  localStorage.setItem('pypad-theme', t);
+  localStorage.setItem('Pyzer-theme', t);
 }
 
 document.querySelectorAll('.theme-pill').forEach(p => {
@@ -927,7 +927,7 @@ codeInput.value = '';
 updateHighlight();
 if (!py.ready) appendOutput('Loading Python engine...', 'info');
 
-const savedTheme = localStorage.getItem('pypad-theme') || 'dark';
+const savedTheme = localStorage.getItem('Pyzer-theme') || 'dark';
 setTheme(savedTheme);
 
 document.body.addEventListener('touchmove', e => {
